@@ -1,0 +1,30 @@
+services:
+
+  n8n:
+    image: n8nio/n8n                   
+    ports:
+      - "5678:5678"                     
+    volumes:
+      - n8n_data:/home/node/.n8n        
+    networks:
+      - lead-hunter-net                 
+
+  
+  fast-scan:
+    build: ./services/fast-scan         
+    ports:
+      - "8000:8000"    
+    env_file:                                       
+      - ./services/fast-scan/.env                     
+    volumes:
+      - ./services/fast-scan/src:/app/src           
+    networks:
+      - lead-hunter-net                 
+
+networks:
+  lead-hunter-net:
+    driver: bridge
+
+
+volumes:
+  n8n_data:
