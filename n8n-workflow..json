@@ -1,0 +1,530 @@
+{
+  "name": "AI-Powered Lead Generation",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1136,
+        -80
+      ],
+      "id": "d0e45166-39cc-4fa3-9a92-34804fd7febd",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fast-scan:8000/scan-maps",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"target\": \"Dental clinics in Manila\",\n  \"max_result\": 10\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -976,
+        -80
+      ],
+      "id": "6ed6a0f6-a488-473d-a030-0f648469474d",
+      "name": "Scraper API"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -816,
+        -80
+      ],
+      "id": "182733f6-2621-4144-adc9-d941abb9e0f7",
+      "name": "Split Scrape Results"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ffecdlnhvzmmbkiciqww.supabase.co/rest/v1/rpc/check_lead",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"p_name\": \"{{ $json.name }}\",\n  \"p_place_id\": \"{{ $json.place_id }}\"\n}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "db_check_result"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        -608,
+        -16
+      ],
+      "id": "03d84694-f8f8-4bc7-8a26-e76f48ae6981",
+      "name": "Supabase DB Check",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Te8ySRI7pDEAEhNY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -448,
+        -80
+      ],
+      "id": "b634dcac-f4f5-415f-9c29-4cf47576b5c1",
+      "name": "Recombine Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "64c72f65-be2f-4766-abd0-03afa4a84e5b",
+              "leftValue": "={{ $json.db_check_result }}",
+              "rightValue": "new",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -288,
+        -80
+      ],
+      "id": "c637805f-9b06-4e3e-bf5e-1bed3125ef9f",
+      "name": "Keep Only New Leads",
+      "alwaysOutputData": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "content": "## Filter",
+        "height": 336,
+        "width": 534,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -672,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "50ff0420-0064-4290-93da-15a38bb600c9",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -128
+      ],
+      "id": "e35d5cc7-9453-4f22-8dca-b3de669f0269",
+      "name": "Merge Batch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  {\n    \"model\": \"llama-3.1-8b-instant\",\n    \"messages\": [\n      {\n        \"role\": \"system\",\n        \"content\": \"I am providing a JSON array of leads. Return a JSON object with a single key 'evaluated_leads' containing exactly the same array, but add a new field to every object called 'ai_status' with either the word 'Corporate' (if it's a massive franchise, HW store, or directory like Home Depot/Yelp) or 'Valid' (if it is a local, independent small business).\"\n      },\n      {\n        \"role\": \"user\",\n        \"content\": JSON.stringify($json.results) \n      }\n    ],\n    \"temperature\": 0,\n    \"response_format\": {\"type\": \"json_object\"}\n  }\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        80,
+        -80
+      ],
+      "id": "0768303c-bd57-47ea-bbab-adf4c52dc975",
+      "name": "AI Evaluator - Groq Llama 3",
+      "credentials": {
+        "groqApi": {
+          "id": "gJECVtfSq96HSnr9",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54aeba37-b253-4316-a721-66d0bd4fa9e9",
+              "name": "final_leads",
+              "value": "={{ JSON.parse($json.choices[0].message.content).evaluated_leads }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        240,
+        -80
+      ],
+      "id": "7563b6c3-da7a-42e5-8cbb-0f789af2d1b4",
+      "name": "Parse Result"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "final_leads",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        448,
+        -80
+      ],
+      "id": "4b922bc9-7974-4d1b-b0d1-27822b0704c4",
+      "name": "Split Evaluated Results"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "450a2809-62f1-4f8d-8b9a-3daaec857355",
+              "leftValue": "={{ $json.ai_status }}",
+              "rightValue": "valid",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        608,
+        -80
+      ],
+      "id": "11487dde-569f-40c5-89bc-9dca05c23221",
+      "name": "Output Router"
+    },
+    {
+      "parameters": {
+        "tableId": "blacklist",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -16
+      ],
+      "id": "7367e752-ea60-4808-880d-23d286d6752b",
+      "name": "Update Blacklist",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Te8ySRI7pDEAEhNY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Loop Over Items1').item.json.name }}"
+            },
+            {
+              "fieldId": "place_id",
+              "fieldValue": "={{ $('Loop Over Items1').item.json.place_id }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $('Loop Over Items1').item.json.phone }}"
+            },
+            {
+              "fieldId": "address",
+              "fieldValue": "={{ $('Loop Over Items1').item.json.address }}"
+            },
+            {
+              "fieldId": "website",
+              "fieldValue": "={{ $('Loop Over Items1').item.json.website }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        768,
+        -144
+      ],
+      "id": "84ac549c-77b6-44c7-bf24-f6ace53f691c",
+      "name": "Save to DB",
+      "credentials": {
+        "supabaseApi": {
+          "id": "Te8ySRI7pDEAEhNY",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Evaluate",
+        "height": 336,
+        "width": 512,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -128,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "63afc71c-47fd-455c-a480-477982fb3f6a",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Extraction\n",
+        "height": 336,
+        "width": 502,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1184,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "f789d20c-5654-4118-acf8-5c3676df261b",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Routing\n",
+        "height": 336,
+        "width": 560,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        400,
+        -192
+      ],
+      "typeVersion": 1,
+      "id": "7f1ec7fd-e356-446b-8129-0b35cd5a81d2",
+      "name": "Sticky Note3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Scraper API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scraper API": {
+      "main": [
+        [
+          {
+            "node": "Split Scrape Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Scrape Results": {
+      "main": [
+        [
+          {
+            "node": "Supabase DB Check",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Recombine Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase DB Check": {
+      "main": [
+        [
+          {
+            "node": "Recombine Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Recombine Data": {
+      "main": [
+        [
+          {
+            "node": "Keep Only New Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Only New Leads": {
+      "main": [
+        [
+          {
+            "node": "Merge Batch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Merge Batch": {
+      "main": [
+        [
+          {
+            "node": "AI Evaluator - Groq Llama 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Evaluator - Groq Llama 3": {
+      "main": [
+        [
+          {
+            "node": "Parse Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Result": {
+      "main": [
+        [
+          {
+            "node": "Split Evaluated Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Evaluated Results": {
+      "main": [
+        [
+          {
+            "node": "Output Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Output Router": {
+      "main": [
+        [
+          {
+            "node": "Save to DB",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update Blacklist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save to DB": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false
+  },
+  "versionId": "af67656c-2c34-47b8-8c42-53e1268ce8fb",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "d58a6522c085787e11440d87183d167d34b4f2dd5c882a84eb734e0dc37614eb"
+  },
+  "id": "_FSd0WkitmupLV7aMIoa6",
+  "tags": []
+}
