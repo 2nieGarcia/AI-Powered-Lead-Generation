@@ -1,57 +1,11 @@
-import os
 import logging
-import re
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
 from playwright.async_api import async_playwright
-from supabase import create_client, Client
+from schemas.scan import LeadResult
 
-router = APIRouter()
-
-SUPABASE_URL = os.getenv("SUPABASE_URL")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY")
-
-def get_supabase() -> Client:
-    if not SUPABASE_URL or not SUPABASE_KEY:
-        raise HTTPException(status_code=500, detail="Supabase credentials not set")
-    
-    print(f"DEBUG: Connecting to Supabase at {SUPABASE_URL}")
-    return create_client(SUPABASE_URL, SUPABASE_KEY)
-
-@router.get("/blacklist")
-def get_blacklist():
-    try:
-        supabase = get_supabase()
-        response = supabase.table("blacklist").select("*").execute()
-        names = [item['name'] for item in response.data]
-        return {"blacklist": names}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-class ScanRequest(BaseModel):
-    target: str
-    max_result: int = 20
-
-class LeadResult(BaseModel):
-    name: str
-    place_id: str
-    phone: str | None = None
-    address: str | None = None
-    website: str | None = None
-
-class ScanResponse(BaseModel):
-    results: list[LeadResult]
-
-@router.get("/health")
-def health_check():
-    return {"status": "fast-scan is alive"}
-
-@router.post("/scan-maps", response_model=ScanResponse)
-async def scan_maps(request: ScanRequest):
-    logger.info(f"Starting scan for : {request.target} with max results {request.max_result}")
+async def scrape_google_maps(target: str, max_result: int) -> list[LeadResult]:
+    logger.info(f"Starting scan for : {target} with max results {max_result}")
     results = []
     raw_json_responses = []
 
@@ -69,7 +23,7 @@ async def scan_maps(request: ScanRequest):
 
         page.on("response", handle_response)
 
-        await page.goto(f"https://www.google.com/maps/search/{request.target}")
+        await page.goto(f"https://www.google.com/maps/search/{target}")
         await page.wait_for_selector('div[role="feed"]', timeout=10000)
 
         scrollable = page.locator('div[role="feed"]')
@@ -80,13 +34,13 @@ async def scan_maps(request: ScanRequest):
             await page.wait_for_timeout(2000)
 
             cards = await page.locator('div[role="feed"] > div > div > a').all()
-            if len(cards) <= previous_count or len(cards) >= request.max_result:
+            if len(cards) <= previous_count or len(cards) >= max_result:
                 break
             previous_count = len(cards)
 
 
         cards = await page.locator('div[role="feed"] > div > div > a').all()
-        for card in cards[:request.max_result]:
+        for card in cards[:max_result]:
             try:
                 name = await card.get_attribute('aria-label') or "N/A"
                 href = await card.get_attribute('href') or ""
@@ -127,7 +81,7 @@ async def scan_maps(request: ScanRequest):
                         raw_website = await website_el.first.get_attribute('href')
                         if raw_website:
                             website = raw_website.strip()
-                except Exception:
+                except Exception as e:
                     logger.warning(f"[{name}] Website extraction failed: {e}")
 
                 results.append(LeadResult(
@@ -145,4 +99,4 @@ async def scan_maps(request: ScanRequest):
 
         await browser.close()
 
-    return ScanResponse(results=results)
+    return results

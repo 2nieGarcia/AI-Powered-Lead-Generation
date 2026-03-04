@@ -41,6 +41,37 @@ The pipeline is split into four highly optimized micro-processes to ensure minim
 - **Save to DB (True):** Inserts fully verified, local small businesses into the `leads` table for the next phase of deep web auditing.
 - **Update Blacklist (False):** Inserts massive corporate chains and franchises into the `blacklist` table. This creates a **self-learning pipeline**, ensuring the Database Shield (Phase 2) will automatically block this corporate entity entirely on all future execution runs.
 
+## Folder Structure
+
+```
+AI-Powered-Lead-Generation/
+├── services/
+│   └── fast-scan/
+│       ├── src/
+│       │   ├── api/
+│       │   │   ├── routes/
+│       │   │   │   ├── blacklist.py
+│       │   │   │   ├── health.py
+│       │   │   │   └── scan.py
+│       │   │   ├── __init__.py
+│       │   │   └── dependencies.py
+│       │   ├── core/
+│       │   │   └── config.py
+│       │   ├── schemas/
+│       │   │   └── scan.py
+│       │   ├── services/
+│       │   │   └── scrapper.py
+│       │   └── main.py
+│       ├── .env
+│       ├── Dockerfile
+│       └── requirements.txt
+├── .gitignore
+├── docker-compose.yml
+├── n8n-workflow.json
+├── pipeline.png
+└── README.md
+```
+
 ## Running the Project
 
 1. Clone the repository.
