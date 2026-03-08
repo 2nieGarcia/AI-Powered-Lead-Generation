@@ -1,0 +1,1798 @@
+{
+  "name": "AI-Powered Lead Generation",
+  "nodes": [
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fast-scan:8000/scan-maps",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"target\": \"{{ $json.target }}\",\n  \"max_result\": \"{{ $json.max_result }}\"\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        352,
+        112
+      ],
+      "id": "377017fc-3e02-45a2-a5b3-db4312b3dbc6",
+      "name": "Scraper API"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        512,
+        112
+      ],
+      "id": "1a1f2cfd-7443-4d94-81dd-3a4f122dfc86",
+      "name": "Split Scrape Results"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1088,
+        112
+      ],
+      "id": "156e3631-688b-4716-8795-65659c1db0e0",
+      "name": "Recombine Data"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "64c72f65-be2f-4766-abd0-03afa4a84e5b",
+              "leftValue": "={{ $json.duplicate }}",
+              "rightValue": "false",
+              "operator": {
+                "type": "boolean",
+                "operation": "false",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1248,
+        112
+      ],
+      "id": "115c31bd-27bb-44b0-90ae-db4dd8e4ad83",
+      "name": "Keep Only New Leads",
+      "alwaysOutputData": false,
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "content": "## Filter",
+        "height": 336,
+        "width": 742,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        656,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "ebdd023e-dcc9-48a2-a1c2-4844527f5645",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "results",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1456,
+        64
+      ],
+      "id": "f7a8b6a9-b994-4139-9370-57565ee680a1",
+      "name": "Merge Batch"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "groqApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  {\n    \"model\": \"llama-3.1-8b-instant\",\n    \"messages\": [\n      {\n        \"role\": \"system\",\n        \"content\": \"I am providing a JSON array of leads. Return a JSON object with a single key 'evaluated_leads' containing exactly the same array, but add a new field to every object called 'ai_status' with either the word 'Corporate' (if it's a massive franchise, HW store, or directory like Home Depot/Yelp) or 'Valid' (if it is a local, independent small business).\"\n      },\n      {\n        \"role\": \"user\",\n        \"content\": JSON.stringify($json.results) \n      }\n    ],\n    \"temperature\": 0,\n    \"response_format\": {\"type\": \"json_object\"}\n  }\n}}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1616,
+        112
+      ],
+      "id": "31cad9fd-792f-441a-a42c-935ca938e62f",
+      "name": "AI Evaluator - Groq Llama 3",
+      "credentials": {
+        "groqApi": {
+          "id": "jTEtaWkktp9dcjLr",
+          "name": "Groq account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54aeba37-b253-4316-a721-66d0bd4fa9e9",
+              "name": "final_leads",
+              "value": "={{ JSON.parse($json.choices[0].message.content).evaluated_leads }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1776,
+        112
+      ],
+      "id": "331632fb-b0f5-474d-8d96-f630d63d273f",
+      "name": "Parse Result"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "final_leads",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1984,
+        112
+      ],
+      "id": "0078679c-7c64-4c95-a9ad-25f5e0b2cc15",
+      "name": "Split Evaluated Results"
+    },
+    {
+      "parameters": {
+        "content": "## Evaluate",
+        "height": 336,
+        "width": 512,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1408,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "a6230572-f682-40d8-9ba8-93c68366b613",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Extraction\n",
+        "height": 336,
+        "width": 342,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        304,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "a1215ecf-6f27-49d0-a920-e8c521254209",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Routing\n",
+        "height": 336,
+        "width": 496,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        1936,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "a1b7f9bd-0b7e-451e-872c-d3c0a8559f0a",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1808,
+        160
+      ],
+      "id": "b8ba049b-b80c-48a2-ab0f-d36cb5054dc2",
+      "name": "Telegram Trigger",
+      "webhookId": "47fef32c-9932-4b66-966d-d02218de558c",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=NEW LEAD: {{ $('Call_back or Message').item.json.queue[1].name }}\n\n📝 *AI Description / Summary:*\n{{ $('Call_back or Message').item.json.queue[1].description }}\n\nWhat would you like to do?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Add (Approve)",
+                    "additionalFields": {
+                      "callback_data": "Add"
+                    }
+                  },
+                  {
+                    "text": "Discard (Blacklist)",
+                    "additionalFields": {
+                      "callback_data": "=Discard"
+                    }
+                  },
+                  {
+                    "text": "Done (Exit)",
+                    "additionalFields": {
+                      "callback_data": "Done|exit"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        752,
+        -384
+      ],
+      "id": "d5ece116-0ede-487d-aeb9-c4e7cc5a6654",
+      "name": "Send a text message",
+      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "Add",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4a68c734-13ce-4d6b-a0b5-7b75a69da32a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9fff82b2-b8df-4e6b-830f-b910340a4cc1",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "Discard",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f6930b11-07dd-4a69-b061-90e8c2d2428b",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "More",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        -192
+      ],
+      "id": "e2c00530-25a3-4f8c-8146-e64e7b9c32f7",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e252fe95-7e03-4796-9f75-2d87fccf8a23",
+              "name": "target",
+              "value": "={{ $('Telegram Trigger').item.json.message.text.split(' ').slice(1, -1).join(' ') }}",
+              "type": "string"
+            },
+            {
+              "id": "5ee4221b-edcc-4647-bc7d-78ac521f201e",
+              "name": "max_result",
+              "value": "={{ $('Telegram Trigger').item.json.message.text.split(' ').at(-1) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        144
+      ],
+      "id": "0deb606c-9d15-44e0-85f2-ce0e7c3318d6",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "maxItems": 2,
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -1440,
+        160
+      ],
+      "id": "9ad338f8-0664-4cb0-b0d1-57fa8687e6ef",
+      "name": "Limit"
+    },
+    {
+      "parameters": {
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        3072,
+        -224
+      ],
+      "id": "59421bbc-3607-4598-8fd1-039db13f4cca",
+      "name": "Limit1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "=NEW LEAD: {{ $json.name }}\n\n📝 *AI Description / Summary:*\n{{ $json.description }}\n\n\nWhat would you like to do?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Add (Approve)",
+                    "additionalFields": {
+                      "callback_data": "Add"
+                    }
+                  },
+                  {
+                    "text": "Discard (Blacklist)",
+                    "additionalFields": {
+                      "callback_data": "=Discard"
+                    }
+                  },
+                  {
+                    "text": "Done (Exit)",
+                    "additionalFields": {
+                      "callback_data": "Done|exit"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3392,
+        -224
+      ],
+      "id": "7d998040-dae2-452b-95a4-45b437156ae1",
+      "name": "Send a text message2",
+      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f91c536b-54a3-4120-ae51-acbf856bdc7e",
+              "name": "action",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+              "type": "string"
+            },
+            {
+              "id": "22ec21f3-baa4-40e0-af13-877732f12a48",
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        -64
+      ],
+      "id": "8e9f1982-2aa0-421d-9d11-327dd49fb1c3",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "place_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Call_back or Message').item.json.queue[0].place_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "approved"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -304
+      ],
+      "id": "fca9f2cb-1440-48c2-be02-d40b6f44737d",
+      "name": "Update a row",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "450a2809-62f1-4f8d-8b9a-3daaec857355",
+              "leftValue": "={{ $json.ai_status }}",
+              "rightValue": "Valid",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2144,
+        144
+      ],
+      "id": "4903b58f-9197-4d9a-bcfc-c37d6d3f3ccf",
+      "name": "Output Router1"
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "place_id",
+              "fieldValue": "={{ $json.place_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "address",
+              "fieldValue": "={{ $json.address }}"
+            },
+            {
+              "fieldId": "website",
+              "fieldValue": "={{ $json.website }}"
+            },
+            {
+              "fieldId": "description",
+              "fieldValue": "null"
+            },
+            {
+              "fieldId": "original_prompt",
+              "fieldValue": "={{ $('Edit Fields').item.json.target }}"
+            },
+            {
+              "fieldId": "batch_total",
+              "fieldValue": "={{ $('Edit Fields').item.json.max_result }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "new"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2848,
+        -80
+      ],
+      "id": "2e990813-9ad5-4412-87de-fe9b0663c3b6",
+      "name": "Create a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "name",
+              "renameField": true,
+              "outputFieldName": "new leads"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        3072,
+        -80
+      ],
+      "id": "b34604f2-634f-49e1-9236-5ba60287bffc",
+      "name": "Aggregate"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "=NEW LEADS ADDED: {{ $json[\"new leads\"] }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3248,
+        -80
+      ],
+      "id": "974f7fc4-9449-41c8-9044-8a22f1b946e4",
+      "name": "Send a text message3",
+      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3232,
+        -224
+      ],
+      "id": "895d2cb2-da01-4a28-aba8-27646a1e9459",
+      "name": "Wait",
+      "webhookId": "985f6d86-87aa-4511-ac7b-72c4d76c47d8"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://ffecdlnhvzmmbkiciqww.supabase.co/rest/v1/rpc/check_lead_exists",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "supabaseApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\"pid\": \"{{$json.place_id}}\"}",
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "text",
+              "outputPropertyName": "duplicate"
+            }
+          }
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        768,
+        208
+      ],
+      "id": "5eb26a70-e339-4110-9e16-3de788220aa1",
+      "name": "Supabase DB Check",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "blacklist",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "place_id",
+              "fieldValue": "={{ $json.place_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $json.name }}"
+            },
+            {
+              "fieldId": "reason",
+              "fieldValue": "corporate"
+            },
+            {
+              "fieldId": "original_prompt",
+              "fieldValue": "={{ $('Edit Fields').item.json.target }}"
+            },
+            {
+              "fieldId": "blocked_at",
+              "fieldValue": "corporate_filter_ai"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        2384,
+        224
+      ],
+      "id": "904d8986-42b2-4336-8bb0-c5ec6c98bbe8",
+      "name": "Create a row1",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "queue",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1280,
+        160
+      ],
+      "id": "8c35595d-8765-483d-bd0e-3449558e38f6",
+      "name": "Aggregate1"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "place_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Call_back or Message').item.json.queue[0].place_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        144,
+        -144
+      ],
+      "id": "52be73d8-efc1-4696-b939-d0b4c4398a27",
+      "name": "Delete a row",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "tableId": "blacklist",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "place_id",
+              "fieldValue": "={{ $('Call_back or Message').item.json.queue[0].place_id }}"
+            },
+            {
+              "fieldId": "name",
+              "fieldValue": "={{ $('Call_back or Message').item.json.queue[0].name }}"
+            },
+            {
+              "fieldId": "reason",
+              "fieldValue": "rejected"
+            },
+            {
+              "fieldId": "original_prompt",
+              "fieldValue": "={{ $('Call_back or Message').item.json.queue[1].original_prompt }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -144
+      ],
+      "id": "6f45394e-a40a-4738-9e2f-4d4281e4d0a8",
+      "name": "Create a row2",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "Welcome Maynila",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -256,
+        480
+      ],
+      "id": "fcbbdd1c-c8c3-449f-91da-1a497b4fa1c4",
+      "name": "Send a text message1",
+      "webhookId": "e482430d-a8f8-4284-9635-9bfd4ce25c92",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=NEW LEAD: {{ $('Call_back or Message').item.json.queue[0].name }}\n\n📝 *AI Description / Summary:*\n{{ $('Call_back or Message').item.json.queue[0].description }}\n\nWhat would you like to do?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Add (Approve)",
+                    "additionalFields": {
+                      "callback_data": "Add"
+                    }
+                  },
+                  {
+                    "text": "Discard (Blacklist)",
+                    "additionalFields": {
+                      "callback_data": "=discard"
+                    }
+                  },
+                  {
+                    "text": "Done (Exit)",
+                    "additionalFields": {
+                      "callback_data": "done|exit"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        112,
+        288
+      ],
+      "id": "98637a9d-cc75-4317-8cd5-4c7c26d95ddb",
+      "name": "Send a text message4",
+      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "44c04279-827c-4df1-8cf5-d92d2e1ceb1e",
+              "name": "target",
+              "value": "={{ $('Aggregate1').item.json.queue[1].original_prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "35ce22f4-55b0-45fb-88b8-ba041156da7f",
+              "name": "max_result",
+              "value": "={{ $('Aggregate1').item.json.queue[1].batch_total }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -16,
+        0
+      ],
+      "id": "53cf88e9-520a-4e2a-b34d-15429cb12674",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1d4ecf8-2d52-4db9-9a87-6b068ecacf50",
+              "leftValue": "={{ $('Aggregate1').item.json.queue[1] }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        528,
+        -256
+      ],
+      "id": "1374a65b-eef3-4e44-9d4b-941ab72f2a08",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c8bc33fc-d1a8-488a-8160-6e8583a4b125",
+              "leftValue": "={{ $json.queue[1] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1056,
+        160
+      ],
+      "id": "724b2380-fc4b-42c8-b320-197b24e7537d",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "All done!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        800,
+        -224
+      ],
+      "id": "29166f19-f1e5-4c16-a394-9758e5233f29",
+      "name": "Send a text message5",
+      "webhookId": "f7fe048f-3a7f-448f-ad4d-dd407dc764f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "deleteMessage",
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}"
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        352,
+        -256
+      ],
+      "id": "0b49c220-7b0c-4e3b-9d24-ceef72fb67f0",
+      "name": "Delete a chat message",
+      "webhookId": "fef2b727-322b-4b26-adc4-e549b4f1f371",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bdc4ce2f-1aad-4f25-aec3-312d44ae78ac",
+              "leftValue": "={{ $('Call_back or Message').item.json.queue[0] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -240,
+        288
+      ],
+      "id": "31c754c0-7c72-427f-9f28-90c63ff9a186",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "All done!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -48,
+        368
+      ],
+      "id": "f0a9e5fb-bf2f-467f-8e0c-3b8820368e31",
+      "name": "Send a text message6",
+      "webhookId": "f7fe048f-3a7f-448f-ad4d-dd407dc764f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "bfbf5564-79c4-4f7f-a542-c6c1dd512ea8",
+              "name": "queue[0]",
+              "value": "={{ $json.queue[1] }}",
+              "type": "object"
+            },
+            {
+              "id": "78bdaff2-2f9c-4e05-bdcd-549efb144719",
+              "name": "queue[1]",
+              "value": "={{ $json.queue[0] }}",
+              "type": "object"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -896,
+        304
+      ],
+      "id": "e784e533-0223-439b-854b-7cfe889f4cef",
+      "name": "Swap Queue"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": "/scrape",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    },
+                    "id": "febc63b0-06f3-4790-b781-3a72b7a1c6f9"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b669820d-8209-44ed-b038-db132fb139be",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": "/review",
+                    "operator": {
+                      "type": "string",
+                      "operation": "startsWith"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8585ac95-3d64-49cf-8cf5-ad86ac36ceb3",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
+                    "rightValue": "/start",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -464,
+        128
+      ],
+      "id": "c79a004b-7527-49a5-82fe-6ca91686f496",
+      "name": "Commands"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "keyValue": "new"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1616,
+        160
+      ],
+      "id": "fafd1430-e355-4c52-b0d9-46f3dbf517d5",
+      "name": "Get New Leads",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Telegram Trigger').item.json.callback_query }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    },
+                    "id": "eec7ac35-83e4-46a0-8419-37e1b5714021"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "780047d4-5968-4d9a-ace4-8909aacdfd6d",
+                    "leftValue": "={{ $('Telegram Trigger').item.json.message }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "object",
+                      "operation": "exists",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -752,
+        160
+      ],
+      "id": "cc3410d7-3546-47ac-b792-b4beb6fcb119",
+      "name": "Call_back or Message"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Scraper API": {
+      "main": [
+        [
+          {
+            "node": "Split Scrape Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Scrape Results": {
+      "main": [
+        [
+          {
+            "node": "Recombine Data",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Supabase DB Check",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recombine Data": {
+      "main": [
+        [
+          {
+            "node": "Keep Only New Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Only New Leads": {
+      "main": [
+        [
+          {
+            "node": "Merge Batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Batch": {
+      "main": [
+        [
+          {
+            "node": "AI Evaluator - Groq Llama 3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Evaluator - Groq Llama 3": {
+      "main": [
+        [
+          {
+            "node": "Parse Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Result": {
+      "main": [
+        [
+          {
+            "node": "Split Evaluated Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Evaluated Results": {
+      "main": [
+        [
+          {
+            "node": "Output Router1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get New Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a row2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Scraper API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit": {
+      "main": [
+        [
+          {
+            "node": "Aggregate1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit1": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row": {
+      "main": [
+        [
+          {
+            "node": "Delete a chat message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message2": {
+      "main": [
+        []
+      ]
+    },
+    "Output Router1": {
+      "main": [
+        [
+          {
+            "node": "Create a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row": {
+      "main": [
+        [
+          {
+            "node": "Aggregate",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Limit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate": {
+      "main": [
+        [
+          {
+            "node": "Send a text message3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Send a text message2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Supabase DB Check": {
+      "main": [
+        [
+          {
+            "node": "Recombine Data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Aggregate1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a row2": {
+      "main": [
+        [
+          {
+            "node": "Delete a row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a row": {
+      "main": [
+        [
+          {
+            "node": "Delete a chat message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Scraper API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Swap Queue",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call_back or Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Delete a chat message": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Send a text message4",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Swap Queue": {
+      "main": [
+        [
+          {
+            "node": "Call_back or Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Commands": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get New Leads": {
+      "main": [
+        [
+          {
+            "node": "Limit",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call_back or Message": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Commands",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": false,
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner"
+  },
+  "versionId": "9144cce5-1bc8-44f9-845a-8cddc13317c2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "c9549210d8467cae1a623788ba199b39aa8d4d550a080f41cbed854057b200e7"
+  },
+  "id": "Phz9Q6ktuFaLOlTotFMAi",
+  "tags": []
+}

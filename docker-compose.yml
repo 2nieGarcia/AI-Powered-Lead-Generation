@@ -3,28 +3,41 @@ services:
   n8n:
     image: n8nio/n8n                   
     ports:
-      - "5678:5678"                     
+      - "5678:5678"
+    environment:
+      - N8N_HOST=0.0.0.0
+      - WEBHOOK_URL=${WEBHOOK_URL}                 
     volumes:
       - n8n_data:/home/node/.n8n        
     networks:
       - lead-hunter-net                 
 
-  
   fast-scan:
     build: ./services/fast-scan         
     ports:
-      - "8000:8000"    
-    env_file:                                       
-      - ./services/fast-scan/.env                     
+      - "8000:8000"
+    environment:
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_KEY=${SUPABASE_KEY}
     volumes:
       - ./services/fast-scan/src:/app/src           
     networks:
-      - lead-hunter-net                 
+      - lead-hunter-net
+
+  ngrok:
+    image: ngrok/ngrok:latest
+    command: http --domain=${NGROK_DOMAIN} n8n:5678
+    environment:
+      - NGROK_AUTHTOKEN=${NGROK_AUTHTOKEN}
+    depends_on:
+      - n8n
+    networks:
+      - lead-hunter-net
 
 networks:
   lead-hunter-net:
     driver: bridge
-
 
 volumes:
   n8n_data:
