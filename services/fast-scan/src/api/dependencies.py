@@ -10,3 +10,5 @@ def get_supabase() -> Client:
         raise HTTPException(status_code=500, detail="Supabase credentials not set")
     
     return create_client(SUPABASE_URL, SUPABASE_KEY)
+
+

@@ -1,5 +1,14 @@
 fastapi
 uvicorn
-playwright
-pydantic-settings
+httpx
+pydantic
+python-dotenv
+duckduckgo-search
+ddgs
+groq
 supabase
+sentence-transformers
+playwright
+beautifulsoup4
+Pillow
+pydantic-settings

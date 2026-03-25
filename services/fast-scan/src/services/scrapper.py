@@ -100,3 +100,8 @@ async def scrape_google_maps(target: str, max_result: int) -> list[LeadResult]:
         await browser.close()
 
     return results
+
+
+
+
+

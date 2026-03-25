@@ -13,3 +13,5 @@ class LeadResult(BaseModel):
 
 class ScanResponse(BaseModel):
     results: list[LeadResult]
+
+

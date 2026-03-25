@@ -13,3 +13,6 @@ def get_blacklist(supabase: Client = Depends(get_supabase)):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     
+
+
+
