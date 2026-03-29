@@ -76,7 +76,7 @@ def build_gemini_user_prompt(business_name: str, address: str, facebook_url: str
         
     return prompt
 
-def build_groq_user_prompt(business_name: str, address: str, facebook_url: str | None) -> str:
+def build_groq_user_prompt(business_name: str, address: str, facebook_url: str | None = None) -> str:
     prompt = f"Business Name: {business_name}\n"
     if address:
         prompt += f"Address: {address}\n"

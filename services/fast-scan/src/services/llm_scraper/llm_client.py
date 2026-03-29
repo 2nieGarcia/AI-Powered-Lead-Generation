@@ -85,7 +85,7 @@ async def _call_gemini(request: AuditRequest) -> str:
 async def _call_groq(request: AuditRequest, search_context: str) -> str:
     system_prompt_with_context = GROQ_SYSTEM_PROMPT.format(search_context=search_context)
 
-    user_prompt = build_groq_user_prompt(request.business_name, request.address)
+    user_prompt = build_groq_user_prompt(request.business_name, request.address, request.facebook_url)
 
     payload = {
         "model": Config.GROQ_MODEL,
@@ -94,7 +94,7 @@ async def _call_groq(request: AuditRequest, search_context: str) -> str:
             {"role": "user", "content": user_prompt}
         ],
         "temperature": 0.1,
-        "max_tokens": 2048
+        "max_tokens": 800
     }
 
     async with httpx.AsyncClient(timeout=30.0) as client:

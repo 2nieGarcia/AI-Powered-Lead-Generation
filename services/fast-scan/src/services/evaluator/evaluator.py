@@ -104,7 +104,7 @@ async def evaluate_lead(payload: dict) -> dict:
             {"role": "user", "content": user_prompt}
         ],
         temperature=0.2,
-        max_tokens=2500,
+        max_tokens=2000,
         response_format={"type": "json_object"}
     )
 
