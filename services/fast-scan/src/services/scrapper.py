@@ -4,8 +4,8 @@ from schemas.scan import LeadResult
 
 logger = logging.getLogger(__name__)
 
-async def scrape_google_maps(target: str, max_result: int) -> list[LeadResult]:
-    logger.info(f"Starting scan for : {target} with max results {max_result}")
+async def scrape_google_maps(target: str, max_result: int, offset: int = 0) -> list[LeadResult]:
+    logger.info(f"Starting scan for : {target} with max results {max_result} | offset of {offset}")
     results = []
     raw_json_responses = []
 
@@ -34,13 +34,17 @@ async def scrape_google_maps(target: str, max_result: int) -> list[LeadResult]:
             await page.wait_for_timeout(2000)
 
             cards = await page.locator('div[role="feed"] > div > div > a').all()
-            if len(cards) <= previous_count or len(cards) >= max_result:
+            if len(cards) <= previous_count or len(cards) >= (max_result + offset):
                 break
             previous_count = len(cards)
 
 
         cards = await page.locator('div[role="feed"] > div > div > a').all()
-        for card in cards[:max_result]:
+
+        target_cards = cards[offset:offset + max_result]
+
+        
+        for card in target_cards:
             try:
                 name = await card.get_attribute('aria-label') or "N/A"
                 href = await card.get_attribute('href') or ""
@@ -74,13 +78,33 @@ async def scrape_google_maps(target: str, max_result: int) -> list[LeadResult]:
                     logger.warning(f"[{name}] Address extraction failed: {e}")
 
                 website = None
+                facebook = None
+                instagram = None
 
                 try:
                     website_el = page.locator('a[data-item-id^="authority"]')
                     if await website_el.count() > 0:
                         raw_website = await website_el.first.get_attribute('href')
                         if raw_website:
-                            website = raw_website.strip()
+                            raw_website = raw_website.strip()
+                            if "facebook.com" in raw_website.lower():
+                                facebook = raw_website
+                            elif "instagram.com" in raw_website.lower():
+                                instagram = raw_website
+                            else:
+                                website = raw_website
+
+
+
+                    all_links = await page.locator('a[href^="http"]').all()
+                    for link in all_links:
+                        href = await link.get_attribute('href') or ""
+                        href_lower = href.lower()
+
+                        if "facebook.com" in href_lower and not facebook:
+                            facebook = href.strip()
+                        elif "instagram.com" in href_lower and not instagram:
+                            instagram = href.strip()
                 except Exception as e:
                     logger.warning(f"[{name}] Website extraction failed: {e}")
 
@@ -89,7 +113,9 @@ async def scrape_google_maps(target: str, max_result: int) -> list[LeadResult]:
                     place_id=place_id,
                     phone=phone,
                     address=address,
-                    website=website
+                    website=website,
+                    facebook_url=facebook,
+                    instagram_url=instagram
                 ))
                 logger.info(f"Extracted lead: {name} | Place ID: {place_id} | Phone: {phone} | Address: {address} | Website: {website}")
             except Exception as e:

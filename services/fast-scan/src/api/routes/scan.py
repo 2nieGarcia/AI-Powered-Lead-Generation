@@ -7,7 +7,7 @@ router = APIRouter()
 @router.post("/scan-maps", response_model=ScanResponse)
 async def scan_maps(request: ScanRequest):
     # Call the service layer to do the heavy lifting
-    scraped_leads = await scrape_google_maps(request.target, request.max_result)
+    scraped_leads = await scrape_google_maps(request.target, request.max_result, request.offset)
     return ScanResponse(results=scraped_leads)
 
 
