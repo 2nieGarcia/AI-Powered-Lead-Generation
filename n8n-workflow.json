@@ -250,8 +250,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2128,
-        624
+        1984,
+        528
       ],
       "id": "904d8986-42b2-4336-8bb0-c5ec6c98bbe8",
       "name": "Create a row1",
@@ -488,8 +488,8 @@
       "type": "n8n-nodes-base.summarize",
       "typeVersion": 1.1,
       "position": [
-        2016,
-        144
+        2192,
+        288
       ],
       "id": "eed1e7d7-3c27-4a2c-b923-1f1e1e7439ed",
       "name": "Summarize"
@@ -933,7 +933,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        2160,
+        2192,
         144
       ],
       "id": "f3ede954-0200-4bad-9879-33d063f943fe",
@@ -955,7 +955,7 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        672,
+        624,
         -32
       ],
       "id": "e8ab9d64-7a5a-44bd-9ebd-d0dfbbd7e419",
@@ -978,7 +978,7 @@
       "typeVersion": 1.2,
       "position": [
         480,
-        -144
+        -176
       ],
       "id": "ad113d39-0c11-4ca9-a989-3d7c5eb255e0",
       "name": "Target Error",
@@ -999,8 +999,8 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        16,
-        -48
+        96,
+        -80
       ],
       "id": "f0a9e5fb-bf2f-467f-8e0c-3b8820368e31",
       "name": "Empty Review",
@@ -1022,7 +1022,7 @@
       "typeVersion": 1.2,
       "position": [
         -448,
-        672
+        656
       ],
       "id": "fcbbdd1c-c8c3-449f-91da-1a497b4fa1c4",
       "name": "Welcome",
@@ -1623,8 +1623,8 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -176,
-        -48
+        -80,
+        -128
       ],
       "id": "31c754c0-7c72-427f-9f28-90c63ff9a186",
       "name": "Review exist?"
@@ -1764,22 +1764,6 @@
       ],
       "id": "2b4b9bb5-03bc-41aa-9a5b-30e376f46ded",
       "name": "More than 5?"
-    },
-    {
-      "parameters": {
-        "content": "📥 ENTRY POINT\n─────────────────────────────\nTelegram bot receives all incoming events.\n\n- \"Call_back or Message\" detects whether the\n  event is an inline button press (callback_query)\n  or a typed message.\n\n- Routes to the correct handling branch before\n  any command logic runs.",
-        "height": 896,
-        "width": 1152,
-        "color": 7
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "typeVersion": 1,
-      "position": [
-        -1888,
-        -224
-      ],
-      "id": "09a986cf-fbfa-4b74-901c-b58f6a1ccec7",
-      "name": "Sticky Note"
     },
     {
       "parameters": {
@@ -2184,7 +2168,7 @@
     {
       "parameters": {
         "content": "🔀 COMMAND ROUTING\n─────────────────────────────\n\"Commands\" switch handles three bot commands:\n\n- /scrape {target} — kicks off a new lead search.\n  Extracts the target keyword, sets offset = 0,\n  validates the target isn't blank, sends\n  \"Searching…\" to the user.\n\n- /review — loads the current lead queue\n  from Supabase for human review.\n\n- /start — sends the welcome/help message.",
-        "height": 640,
+        "height": 656,
         "width": 624,
         "color": 6
       },
@@ -2192,7 +2176,7 @@
       "typeVersion": 1,
       "position": [
         -688,
-        176
+        144
       ],
       "id": "477cf097-7b0c-4f14-807a-1e086b1dc33e",
       "name": "Sticky Note1"
@@ -2217,7 +2201,7 @@
       "parameters": {
         "content": "🤖 AI EVALUATION\n─────────────────────────────\nMaster payload is sent to fast-scan\n/api/audit/evaluate for initial scoring.\n\n\"Valid or Corporate?\" routes the result:\n\n- Valid → Groq Llama 3 scores the lead with:\n  agency fit score, priority level,\n  services to offer, pitch angle,\n  digital gaps, reasoning.\n  Result is parsed and split into individual leads.\n\n- Corporate → Lead is immediately saved to\n  Supabase with status = blacklist.\n  No further review needed.",
         "height": 672,
-        "width": 1360
+        "width": 1392
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -2232,13 +2216,13 @@
       "parameters": {
         "content": "🌐 DIGITAL FOOTPRINT AUDIT\n─────────────────────────────\nThree parallel branches run for each lead:\n\n[Facebook branch]\nHas FB Page? → Apify FB scraper\n→ Format FB result / FB Null (if no page)\n\n[Instagram branch]\nHas IG Profile? → Apify IG scraper\n→ Format IG result / IG Null (if no profile)\n\n[Website branch]\nHas website URL? → fast-scan /api/audit/website\n→ Groq Vision Analysis → Qualitative Audit\n→ Format result / Pass null (if audit fails)\n\nAll three branches merge into \"Merge FB + IG +\nWebsite data\", then \"Build master lead payload\"\nassembles the full picture before AI evaluation.\n\n⚠️ \"Wait for Apify rate limit\" (30s) sits before\nthe IG scraper to avoid hitting Apify API limits.",
         "height": 1136,
-        "width": 2528,
+        "width": 2512,
         "color": 5
       },
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
       "position": [
-        2352,
+        2384,
         128
       ],
       "id": "c9f99a5e-5da5-47ad-96ab-8dd6696621e1",
@@ -2294,7 +2278,7 @@
       "parameters": {
         "content": "💾 Full Batched Handler\n─────────────────────────────\n\"Full batch scraped?\" checks if 5 leads have\nbeen processed (duplicate + corporate combined):\n- Yes → stop and notify user with lead count.\n- No  → loop back and scrape the next batch.",
         "height": 432,
-        "width": 1360,
+        "width": 1392,
         "color": 3
       },
       "type": "n8n-nodes-base.stickyNote",
@@ -2305,6 +2289,175 @@
       ],
       "id": "ea3f0dc5-ab9d-4f27-83be-68fce3ceb539",
       "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "false = message \n( Command Routing )",
+        "height": 80,
+        "width": 246
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -928,
+        336
+      ],
+      "id": "7ed05961-94be-4db4-af90-e4150a757391",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "true = Callback\n( Human eval )",
+        "height": 80,
+        "width": 182
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -864,
+        64
+      ],
+      "id": "f82c6856-0e4b-4838-a2e9-c03e698d10e9",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "Callback = more?\n( Lead Scraping )",
+        "height": 80,
+        "width": 182
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -208,
+        64
+      ],
+      "id": "f21fb9c8-90a2-4e37-9aae-4740e4399bef",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "message = /review\n( Human Eval )",
+        "height": 80,
+        "width": 182
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        480
+      ],
+      "id": "ea8ae674-c854-4299-834a-a4a9b77d103f",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "📥 ENTRY POINT\n─────────────────────────────\nTelegram bot receives all incoming events.\n\n- \"Call_back or Message\" detects whether the\n  event is an inline button press (callback_query)\n  or a typed message.\n\n- Routes to the correct handling branch before\n  any command logic runs.",
+        "height": 896,
+        "width": 1152,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1888,
+        -224
+      ],
+      "id": "09a986cf-fbfa-4b74-901c-b58f6a1ccec7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "(Lead Scraping) >",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        528
+      ],
+      "id": "c375fcf0-ce63-4f8a-9901-5546f700df7a",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "< (Lead Scraping)",
+        "height": 80,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1936,
+        1184
+      ],
+      "id": "6fb35713-73fb-4e6f-83b5-c65c53d6a3a2",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "(from Batch handler to scrape again)\n",
+        "height": 80,
+        "width": 278
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        464,
+        752
+      ],
+      "id": "0024b7aa-3908-4d82-ba33-bf54cb3563b9",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "content": "Send updates to user",
+        "height": 80,
+        "width": 150
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        448,
+        176
+      ],
+      "id": "959bece3-a4af-48ec-8658-156e76253a1a",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "Send data to batched handler",
+        "height": 80,
+        "width": 150,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        752
+      ],
+      "id": "902fc672-f85a-4182-9533-cccb6086e30e",
+      "name": "Sticky Note16"
+    },
+    {
+      "parameters": {
+        "content": "Digital Footprint Audit >",
+        "height": 80,
+        "width": 198,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2144,
+        656
+      ],
+      "id": "e8e908a0-e7fc-4625-894a-73831caf149e",
+      "name": "Sticky Note17"
     }
   ],
   "pinData": {},

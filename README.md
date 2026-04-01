@@ -77,19 +77,37 @@ This project demonstrates **end-to-end AI/ML engineering** by building an autono
 
 ## System Architecture
 
+## System Architecture
+
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
-│                              n8n ORCHESTRATION LAYER                             │
+│                           n8n ORCHESTRATION PIPELINE                            │
 ├─────────────────────────────────────────────────────────────────────────────────┤
-│                                                                                  │
-│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
-│  │  EXTRACTION  │───▶│    FILTER    │───▶│   EVALUATE   │───▶│   ROUTING    │   │
-│  │              │    │              │    │              │    │              │   │
-│  │ • Trigger    │    │ • DB Check   │    │ • Merge Batch│    │ • Split      │   │
-│  │ • Scraper API│    │ • Recombine  │    │ • LLM + RAG  │    │ • Route      │   │
-│  │ • Split      │    │ • Dedupe     │    │ • Parse JSON │    │ • Persist    │   │
-│  └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘   │
-│                                                                                  │
+│                                                                                 │
+│ ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐            │
+│ │   ENTRY  │─▶│COMMAND   │─▶│LEAD     │─▶│   AI    │─▶│ BATCH    │            │
+│ │  POINT   │  │ ROUTING  │  │ SCRAPING │  │   EVAL   │  │CONTROLLER│            │
+│ │          │  │          │  │          │  │          │  │   TOOL   │            │
+│ │•Telegram │  │•/scrape  │  │•Maps API │  │•Groq LLM │  │•Count    │            │
+│ │•Message  │  │•/review  │  │•Filter   │  │•Valid/   │  │•Validate │            │
+│ │•Callback │  │•/start   │  │•Dedupe   │  │Corporate │  │•Flow Ctrl│            │
+│ └──────────┘  └──────────┘  └──────────┘  └──────────┘  └──────────┘            │
+│                                              │                   │              │
+│                                              │                   ▼              │
+│                                              │           ┌──────────────────┐   │
+│                                              │           │   FOOTPRINT      │   │
+│                                              │           │   & STORAGE      │   │
+│                                              │           │                  │   │
+│ ┌──────────┐                                 │           │•Facebook Audit   │   │
+│ │   HUMAN  │◀────────────────────────────────┘           │•Instagram Audit  │  │
+│ │  REVIEW  │                                             │•Website Analysis │   │
+│ │   LOOP   │                                             │•Supabase Persist │   │
+│ │          │                                             └──────────────────┘   │
+│ │•Approve/ │                                                                    │
+│ │ Reject   │                                                                    │
+│ │•Telegram │                                                                    │
+│ └──────────┘                                                                    │
+│                                                                                 │
 └─────────────────────────────────────────────────────────────────────────────────┘
                                         │
                     ┌───────────────────┼───────────────────┐
@@ -112,34 +130,76 @@ This project demonstrates **end-to-end AI/ML engineering** by building an autono
 
 ### n8n Pipeline Visualization
 
-![n8n Pipeline Architecture](./pipeline.png)
+![n8n Pipeline Architecture](./docs/screenshots/pipeline.png)
 
 <details>
-<summary><b>📋 Click to expand detailed pipeline stages</b></summary>
+<summary><b> Click to expand detailed pipeline stages with screenshots</b></summary>
 
-#### Stage 1: Extraction
+#### Stage 1: Entry Point
+![Entry Point Screenshot](./docs/screenshots/01-entry-point.png)
 
-- **Manual Trigger** → Initiates the workflow
-- **Scraper API** → `POST` to FastAPI microservice running Playwright
-- **Split Results** → Deconstructs JSON array for parallel processing
+- **Telegram Trigger** → Webhook receives all incoming Telegram events (messages & callback queries)
+- **Message Router** → Switches between `message` (text input) and `callback_query` (button presses)
+- **Event Classification** → Directs flow to appropriate command handlers
 
-#### Stage 2: Database Shield (Filter)
+#### Stage 2: Command Routing  
+![Command Routing Screenshot](./docs/screenshots/02-command-routing.png)
 
-- **Supabase RPC** → Executes `check_lead` stored procedure
-- **Recombine Data** → Zip/Position merge strategy
-- **Deduplicate** → Drops existing leads to save API costs
+- **Commands Switch** → Parses 3 bot commands:
+  - `/scrape {target}` → Initiates new lead search workflow
+  - `/review` → Loads leads for human approval interface
+  - `/start` → Sends welcome message with usage instructions
+- **Target Validation** → Extracts keyword and validates non-empty input
+- **User Feedback** → Sends "Searching..." notification to maintain engagement
 
-#### Stage 3: AI Batch Evaluator
+#### Stage 3: Lead Scraping
+![Lead Scraping Screenshot](./docs/screenshots/03-lead-scraping.png)
 
-- **Merge Batch** → Aggregates leads into single array (Filter Funnel pattern)
-- **LLM Evaluation** → RAG-enhanced scoring with JSON-mode output
-- **Parse Result** → Strict schema validation back to n8n arrays
+- **Scraper API** → `POST` to FastAPI service (`/scan-maps`) with target keyword
+- **Batch Processing** → Returns 5 results max per batch for memory efficiency
+- **Split Results** → Deconstructs JSON array for parallel duplicate checking
+- **Database Shield** → Supabase RPC `check_lead_exists` flags existing entries
+- **Pagination Loop** → Increments offset by 5, repeats until 5 new leads found
 
-#### Stage 4: Intelligent Routing
+#### Stage 4: AI Evaluation
+![AI Evaluation Screenshot](./docs/screenshots/04-ai-evaluation.png)
 
-- **Split Results** → Individual entity processing
-- **Output Router** → Branch on `ai_status` field
-- **Persist** → Valid leads → `leads` table | Corporates → `blacklist` table
+- **Merge Batch** → Aggregates new leads into single LLM payload (cost optimization)
+- **Groq Llama 3.1** → Classifies leads as **"Valid"** (local business) or **"Corporate"** (franchise/chain)
+- **JSON Schema Validation** → Enforces structured output for reliable downstream processing
+- **Split & Route** → Valid leads continue to audit; Corporate leads → blacklist table
+
+#### Stage 5: Batch Controller (Flow Control Tool)
+![Batch Controller Screenshot](./docs/screenshots/05-batch-controller.png)
+
+- **Lead Count Validation** → Aggregates duplicate + corporate rejection counts
+- **Flow Control Logic** → If total processed ≥ 5, stop scraping; else continue pagination
+- **Quality Gate** → Ensures sufficient valid leads before proceeding to expensive audit stage
+- **Loop Management** → Intelligent pagination control to optimize API costs
+
+#### Stage 6: Digital Footprint Audit & Storage (Combined)
+![Footprint and Storage Screenshot](./docs/screenshots/06-footprint-and-storage.png)
+
+**Three Parallel Audit Branches:**
+- **Facebook Branch** → Apify scraper extracts followers, likes, contact info, ratings
+- **Instagram Branch** → Profile scraper with 30s rate limiting delay
+- **Website Branch** → Screenshot analysis + Groq Vision + qualitative business vibe assessment
+
+**Data Fusion & Storage:**
+- **Data Normalization** → Flattens nested AI outputs into clean database schema
+- **Supabase Insert** → Saves complete lead profiles with status = "new"
+- **Batch Processing** → Handles multiple leads efficiently with comprehensive audit data
+
+#### Stage 7: Human Review Loop
+![Human Review Loop Screenshot](./docs/screenshots/07-human-review-loop.png)
+
+- **Queue Management** → Retrieves 2 most recent "new" status leads
+- **Telegram Interface** → Rich cards with business details + 3 action buttons:
+  - **[Add]** → Approve lead (status = "approved") 
+  - **[Discard]** → Blacklist lead (status = "blacklist")
+  - **[Done]** → Exit review session
+- **State Persistence** → Callback routing maintains review session across interactions
+- **User Summary** → Telegram notification with batch results and next action options
 
 </details>
 
@@ -444,13 +504,11 @@ This project is a collaborative effort between two passionate AI engineers:
 <img src="https://github.com/2nieGarcia.png" width="100" style="border-radius: 50%"><br>
 <b>Antonio Garcia</b><br>
 <a href="https://github.com/2nieGarcia">@2nieGarcia</a><br>
-<i>AI/ML Engineering & Architecture</i>
 </td>
 <td align="center">
 <img src="https://github.com/projcjdevs.png" width="100" style="border-radius: 50%"><br>
 <b>Charles Cabatian</b><br>
 <a href="https://github.com/projcjdevs">@projcjdevs</a><br>
-<i>Backend Development & Infrastructure</i>
 </td>
 </tr>
 </table>
