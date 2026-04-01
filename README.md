@@ -434,16 +434,32 @@ n8n provides visual debugging, easy JSON manipulation, and rapid iteration witho
 
 ---
 
-## Contact
+## 👥 Contributors
 
-**Antonio Garcia** — [GitHub](https://github.com/2nieGarcia)
-**Charles Cabatian** - [Github](https://github.com/projcjdevs)
+This project is a collaborative effort between two passionate AI engineers:
+
+<table>
+<tr>
+<td align="center">
+<img src="https://github.com/2nieGarcia.png" width="100" style="border-radius: 50%"><br>
+<b>Antonio Garcia</b><br>
+<a href="https://github.com/2nieGarcia">@2nieGarcia</a><br>
+<i>AI/ML Engineering & Architecture</i>
+</td>
+<td align="center">
+<img src="https://github.com/projcjdevs.png" width="100" style="border-radius: 50%"><br>
+<b>Charles Cabatian</b><br>
+<a href="https://github.com/projcjdevs">@projcjdevs</a><br>
+<i>Backend Development & Infrastructure</i>
+</td>
+</tr>
+</table>
 ---
 
 <div align="center">
 
-### ⭐ If this project demonstrates skills you're looking for, let's connect!
+### ⭐ Interested in our work? Let's connect and build something amazing together!
 
-_Built with passion for AI engineering and a desire to automate the boring stuff._
+*Built with passion for AI engineering, collaborative innovation, and automating the world.*
 
 </div>
