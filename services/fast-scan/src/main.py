@@ -31,6 +31,38 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(title="AI Lead Hunter Fast Scan Service", lifespan=lifespan)
 
+from fastapi.openapi.utils import get_openapi
+
+def custom_openapi():
+    if app.openapi_schema:
+        return app.openapi_schema
+    openapi_schema = get_openapi(
+        title="AI-Powered Lead Generation Pipeline",
+        version="1.0.0",
+        description="""
+        ## Features
+        - **Real-time Web Scraping** via Playwright (Google Maps)
+        - **Vector RAG Retrieval** with Supabase pgvector
+        - **Batched LLM Evaluation** (Groq Llama-3.1)
+        - **Self-Learning Pipeline** (auto-blacklist corporate chains)
+        - **Production-Ready** Docker + n8n orchestration
+        
+        ## Core Endpoints
+        - `/api/scan` - Scrape and extract leads
+        - `/api/audit/evaluate` - Evaluate lead quality with RAG
+        - `/api/blacklist` - Manage corporate blacklist
+        - `/health` - System status
+        """,
+        routes=app.routes,
+    )
+    openapi_schema["info"]["x-logo"] = {
+        "url": "https://fastapi.tiangolo.com/img/logo-margin/logo-teal.png"
+    }
+    app.openapi_schema = openapi_schema
+    return app.openapi_schema
+
+app.openapi = custom_openapi
+
 @app.get("/")
 def read_root():
     return {"message": "Welcome to the Autonomous AI Lead Hunter Fast Scan Service"}
