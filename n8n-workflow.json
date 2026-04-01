@@ -1,5 +1,5 @@
 {
-  "name": "AI-Powered Lead Generation",
+  "name": "Lead Digital Footprint Pipeline",
   "nodes": [
     {
       "parameters": {
@@ -7,14 +7,14 @@
         "url": "http://fast-scan:8000/scan-maps",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={\n  \"target\": \"{{ $json.target }}\",\n  \"max_result\": \"{{ $json.max_result }}\"\n}",
+        "jsonBody": "={\n  \"target\": \"{{ $json.target }}\",\n  \"max_result\": 5,\n  \"offset\": {{ $json.offset }}\n}",
         "options": {}
       },
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        352,
-        112
+        640,
+        480
       ],
       "id": "377017fc-3e02-45a2-a5b3-db4312b3dbc6",
       "name": "Scraper API"
@@ -27,26 +27,11 @@
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        512,
-        112
+        800,
+        480
       ],
       "id": "1a1f2cfd-7443-4d94-81dd-3a4f122dfc86",
       "name": "Split Scrape Results"
-    },
-    {
-      "parameters": {
-        "mode": "combine",
-        "combineBy": "combineByPosition",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.merge",
-      "typeVersion": 3.2,
-      "position": [
-        1088,
-        112
-      ],
-      "id": "156e3631-688b-4716-8795-65659c1db0e0",
-      "name": "Recombine Data"
     },
     {
       "parameters": {
@@ -76,29 +61,13 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        1248,
-        112
+        1312,
+        528
       ],
       "id": "115c31bd-27bb-44b0-90ae-db4dd8e4ad83",
       "name": "Keep Only New Leads",
       "alwaysOutputData": false,
       "notesInFlow": false
-    },
-    {
-      "parameters": {
-        "content": "## Filter",
-        "height": 336,
-        "width": 742,
-        "color": 7
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        656,
-        0
-      ],
-      "typeVersion": 1,
-      "id": "ebdd023e-dcc9-48a2-a1c2-4844527f5645",
-      "name": "Sticky Note1"
     },
     {
       "parameters": {
@@ -109,8 +78,8 @@
       "type": "n8n-nodes-base.aggregate",
       "typeVersion": 1,
       "position": [
-        1456,
-        64
+        1328,
+        384
       ],
       "id": "f7a8b6a9-b994-4139-9370-57565ee680a1",
       "name": "Merge Batch"
@@ -129,8 +98,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        1616,
-        112
+        1504,
+        384
       ],
       "id": "31cad9fd-792f-441a-a42c-935ca938e62f",
       "name": "AI Evaluator - Groq Llama 3",
@@ -143,88 +112,17 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "54aeba37-b253-4316-a721-66d0bd4fa9e9",
-              "name": "final_leads",
-              "value": "={{ JSON.parse($json.choices[0].message.content).evaluated_leads }}",
-              "type": "array"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        1776,
-        112
-      ],
-      "id": "331632fb-b0f5-474d-8d96-f630d63d273f",
-      "name": "Parse Result"
-    },
-    {
-      "parameters": {
         "fieldToSplitOut": "final_leads",
         "options": {}
       },
       "type": "n8n-nodes-base.splitOut",
       "typeVersion": 1,
       "position": [
-        1984,
-        112
+        1808,
+        304
       ],
       "id": "0078679c-7c64-4c95-a9ad-25f5e0b2cc15",
       "name": "Split Evaluated Results"
-    },
-    {
-      "parameters": {
-        "content": "## Evaluate",
-        "height": 336,
-        "width": 512,
-        "color": 7
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        1408,
-        0
-      ],
-      "typeVersion": 1,
-      "id": "a6230572-f682-40d8-9ba8-93c68366b613",
-      "name": "Sticky Note2"
-    },
-    {
-      "parameters": {
-        "content": "## Extraction\n",
-        "height": 336,
-        "width": 342,
-        "color": 7
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        304,
-        0
-      ],
-      "typeVersion": 1,
-      "id": "a1215ecf-6f27-49d0-a920-e8c521254209",
-      "name": "Sticky Note"
-    },
-    {
-      "parameters": {
-        "content": "## Routing\n",
-        "height": 336,
-        "width": 496,
-        "color": 7
-      },
-      "type": "n8n-nodes-base.stickyNote",
-      "position": [
-        1936,
-        0
-      ],
-      "typeVersion": 1,
-      "id": "a1b7f9bd-0b7e-451e-872c-d3c0a8559f0a",
-      "name": "Sticky Note3"
     },
     {
       "parameters": {
@@ -237,7 +135,7 @@
       "type": "n8n-nodes-base.telegramTrigger",
       "typeVersion": 1.2,
       "position": [
-        -1808,
+        -1840,
         160
       ],
       "id": "b8ba049b-b80c-48a2-ab0f-d36cb5054dc2",
@@ -249,276 +147,6 @@
           "name": "Telegram account"
         }
       }
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
-        "text": "=NEW LEAD: {{ $('Call_back or Message').item.json.queue[1].name }}\n\n📝 *AI Description / Summary:*\n{{ $('Call_back or Message').item.json.queue[1].description }}\n\nWhat would you like to do?",
-        "replyMarkup": "inlineKeyboard",
-        "inlineKeyboard": {
-          "rows": [
-            {
-              "row": {
-                "buttons": [
-                  {
-                    "text": "Add (Approve)",
-                    "additionalFields": {
-                      "callback_data": "Add"
-                    }
-                  },
-                  {
-                    "text": "Discard (Blacklist)",
-                    "additionalFields": {
-                      "callback_data": "=Discard"
-                    }
-                  },
-                  {
-                    "text": "Done (Exit)",
-                    "additionalFields": {
-                      "callback_data": "Done|exit"
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        752,
-        -384
-      ],
-      "id": "d5ece116-0ede-487d-aeb9-c4e7cc5a6654",
-      "name": "Send a text message",
-      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
-      "credentials": {
-        "telegramApi": {
-          "id": "u8uZvnn7mHZOOIZS",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "rules": {
-          "values": [
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "leftValue": "={{ $json.action }}",
-                    "rightValue": "Add",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    },
-                    "id": "4a68c734-13ce-4d6b-a0b5-7b75a69da32a"
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "9fff82b2-b8df-4e6b-830f-b910340a4cc1",
-                    "leftValue": "={{ $json.action }}",
-                    "rightValue": "Discard",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "f6930b11-07dd-4a69-b061-90e8c2d2428b",
-                    "leftValue": "={{ $json.action }}",
-                    "rightValue": "More",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              }
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.switch",
-      "typeVersion": 3.4,
-      "position": [
-        -320,
-        -192
-      ],
-      "id": "e2c00530-25a3-4f8c-8146-e64e7b9c32f7",
-      "name": "Switch"
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "e252fe95-7e03-4796-9f75-2d87fccf8a23",
-              "name": "target",
-              "value": "={{ $('Telegram Trigger').item.json.message.text.split(' ').slice(1, -1).join(' ') }}",
-              "type": "string"
-            },
-            {
-              "id": "5ee4221b-edcc-4647-bc7d-78ac521f201e",
-              "name": "max_result",
-              "value": "={{ $('Telegram Trigger').item.json.message.text.split(' ').at(-1) }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -16,
-        144
-      ],
-      "id": "0deb606c-9d15-44e0-85f2-ce0e7c3318d6",
-      "name": "Edit Fields"
-    },
-    {
-      "parameters": {
-        "maxItems": 2,
-        "keep": "lastItems"
-      },
-      "type": "n8n-nodes-base.limit",
-      "typeVersion": 1,
-      "position": [
-        -1440,
-        160
-      ],
-      "id": "9ad338f8-0664-4cb0-b0d1-57fa8687e6ef",
-      "name": "Limit"
-    },
-    {
-      "parameters": {
-        "keep": "lastItems"
-      },
-      "type": "n8n-nodes-base.limit",
-      "typeVersion": 1,
-      "position": [
-        3072,
-        -224
-      ],
-      "id": "59421bbc-3607-4598-8fd1-039db13f4cca",
-      "name": "Limit1"
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
-        "text": "=NEW LEAD: {{ $json.name }}\n\n📝 *AI Description / Summary:*\n{{ $json.description }}\n\n\nWhat would you like to do?",
-        "replyMarkup": "inlineKeyboard",
-        "inlineKeyboard": {
-          "rows": [
-            {
-              "row": {
-                "buttons": [
-                  {
-                    "text": "Add (Approve)",
-                    "additionalFields": {
-                      "callback_data": "Add"
-                    }
-                  },
-                  {
-                    "text": "Discard (Blacklist)",
-                    "additionalFields": {
-                      "callback_data": "=Discard"
-                    }
-                  },
-                  {
-                    "text": "Done (Exit)",
-                    "additionalFields": {
-                      "callback_data": "Done|exit"
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        3392,
-        -224
-      ],
-      "id": "7d998040-dae2-452b-95a4-45b437156ae1",
-      "name": "Send a text message2",
-      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
-      "credentials": {
-        "telegramApi": {
-          "id": "u8uZvnn7mHZOOIZS",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "f91c536b-54a3-4120-ae51-acbf856bdc7e",
-              "name": "action",
-              "value": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
-              "type": "string"
-            },
-            {
-              "id": "22ec21f3-baa4-40e0-af13-877732f12a48",
-              "name": "chat_id",
-              "value": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -576,
-        -64
-      ],
-      "id": "8e9f1982-2aa0-421d-9d11-327dd49fb1c3",
-      "name": "Edit Fields1"
     },
     {
       "parameters": {
@@ -545,8 +173,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        -64,
-        -304
+        -272,
+        -464
       ],
       "id": "fca9f2cb-1440-48c2-be02-d40b6f44737d",
       "name": "Update a row",
@@ -557,154 +185,6 @@
           "name": "Supabase account"
         }
       }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "450a2809-62f1-4f8d-8b9a-3daaec857355",
-              "leftValue": "={{ $json.ai_status }}",
-              "rightValue": "Valid",
-              "operator": {
-                "type": "string",
-                "operation": "contains"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        2144,
-        144
-      ],
-      "id": "4903b58f-9197-4d9a-bcfc-c37d6d3f3ccf",
-      "name": "Output Router1"
-    },
-    {
-      "parameters": {
-        "tableId": "leads",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "place_id",
-              "fieldValue": "={{ $json.place_id }}"
-            },
-            {
-              "fieldId": "name",
-              "fieldValue": "={{ $json.name }}"
-            },
-            {
-              "fieldId": "phone",
-              "fieldValue": "={{ $json.phone }}"
-            },
-            {
-              "fieldId": "address",
-              "fieldValue": "={{ $json.address }}"
-            },
-            {
-              "fieldId": "website",
-              "fieldValue": "={{ $json.website }}"
-            },
-            {
-              "fieldId": "description",
-              "fieldValue": "null"
-            },
-            {
-              "fieldId": "original_prompt",
-              "fieldValue": "={{ $('Edit Fields').item.json.target }}"
-            },
-            {
-              "fieldId": "batch_total",
-              "fieldValue": "={{ $('Edit Fields').item.json.max_result }}"
-            },
-            {
-              "fieldId": "status",
-              "fieldValue": "new"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        2848,
-        -80
-      ],
-      "id": "2e990813-9ad5-4412-87de-fe9b0663c3b6",
-      "name": "Create a row",
-      "credentials": {
-        "supabaseApi": {
-          "id": "kV2CfQktaTJstCXH",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "fieldsToAggregate": {
-          "fieldToAggregate": [
-            {
-              "fieldToAggregate": "name",
-              "renameField": true,
-              "outputFieldName": "new leads"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        3072,
-        -80
-      ],
-      "id": "b34604f2-634f-49e1-9236-5ba60287bffc",
-      "name": "Aggregate"
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
-        "text": "=NEW LEADS ADDED: {{ $json[\"new leads\"] }}",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        3248,
-        -80
-      ],
-      "id": "974f7fc4-9449-41c8-9044-8a22f1b946e4",
-      "name": "Send a text message3",
-      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
-      "credentials": {
-        "telegramApi": {
-          "id": "u8uZvnn7mHZOOIZS",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {},
-      "type": "n8n-nodes-base.wait",
-      "typeVersion": 1.1,
-      "position": [
-        3232,
-        -224
-      ],
-      "id": "895d2cb2-da01-4a28-aba8-27646a1e9459",
-      "name": "Wait",
-      "webhookId": "985f6d86-87aa-4511-ac7b-72c4d76c47d8"
     },
     {
       "parameters": {
@@ -727,8 +207,8 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.3,
       "position": [
-        768,
-        208
+        800,
+        320
       ],
       "id": "5eb26a70-e339-4110-9e16-3de788220aa1",
       "name": "Supabase DB Check",
@@ -741,7 +221,7 @@
     },
     {
       "parameters": {
-        "tableId": "blacklist",
+        "tableId": "leads",
         "fieldsUi": {
           "fieldValues": [
             {
@@ -749,20 +229,20 @@
               "fieldValue": "={{ $json.place_id }}"
             },
             {
-              "fieldId": "name",
+              "fieldId": "business_name",
               "fieldValue": "={{ $json.name }}"
             },
             {
-              "fieldId": "reason",
-              "fieldValue": "corporate"
+              "fieldId": "address",
+              "fieldValue": "={{ $json.address }}"
             },
             {
-              "fieldId": "original_prompt",
-              "fieldValue": "={{ $('Edit Fields').item.json.target }}"
+              "fieldId": "the_reasoning",
+              "fieldValue": "Corporate"
             },
             {
-              "fieldId": "blocked_at",
-              "fieldValue": "corporate_filter_ai"
+              "fieldId": "status",
+              "fieldValue": "blacklist"
             }
           ]
         }
@@ -770,8 +250,8 @@
       "type": "n8n-nodes-base.supabase",
       "typeVersion": 1,
       "position": [
-        2384,
-        224
+        2128,
+        624
       ],
       "id": "904d8986-42b2-4336-8bb0-c5ec6c98bbe8",
       "name": "Create a row1",
@@ -784,281 +264,6 @@
     },
     {
       "parameters": {
-        "aggregate": "aggregateAllItemData",
-        "destinationFieldName": "queue",
-        "options": {}
-      },
-      "type": "n8n-nodes-base.aggregate",
-      "typeVersion": 1,
-      "position": [
-        -1280,
-        160
-      ],
-      "id": "8c35595d-8765-483d-bd0e-3449558e38f6",
-      "name": "Aggregate1"
-    },
-    {
-      "parameters": {
-        "operation": "delete",
-        "tableId": "leads",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "place_id",
-              "condition": "eq",
-              "keyValue": "={{ $('Call_back or Message').item.json.queue[0].place_id }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        144,
-        -144
-      ],
-      "id": "52be73d8-efc1-4696-b939-d0b4c4398a27",
-      "name": "Delete a row",
-      "credentials": {
-        "supabaseApi": {
-          "id": "kV2CfQktaTJstCXH",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "tableId": "blacklist",
-        "fieldsUi": {
-          "fieldValues": [
-            {
-              "fieldId": "place_id",
-              "fieldValue": "={{ $('Call_back or Message').item.json.queue[0].place_id }}"
-            },
-            {
-              "fieldId": "name",
-              "fieldValue": "={{ $('Call_back or Message').item.json.queue[0].name }}"
-            },
-            {
-              "fieldId": "reason",
-              "fieldValue": "rejected"
-            },
-            {
-              "fieldId": "original_prompt",
-              "fieldValue": "={{ $('Call_back or Message').item.json.queue[1].original_prompt }}"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        -64,
-        -144
-      ],
-      "id": "6f45394e-a40a-4738-9e2f-4d4281e4d0a8",
-      "name": "Create a row2",
-      "credentials": {
-        "supabaseApi": {
-          "id": "kV2CfQktaTJstCXH",
-          "name": "Supabase account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
-        "text": "Welcome Maynila",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        -256,
-        480
-      ],
-      "id": "fcbbdd1c-c8c3-449f-91da-1a497b4fa1c4",
-      "name": "Send a text message1",
-      "webhookId": "e482430d-a8f8-4284-9635-9bfd4ce25c92",
-      "credentials": {
-        "telegramApi": {
-          "id": "u8uZvnn7mHZOOIZS",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
-        "text": "=NEW LEAD: {{ $('Call_back or Message').item.json.queue[0].name }}\n\n📝 *AI Description / Summary:*\n{{ $('Call_back or Message').item.json.queue[0].description }}\n\nWhat would you like to do?",
-        "replyMarkup": "inlineKeyboard",
-        "inlineKeyboard": {
-          "rows": [
-            {
-              "row": {
-                "buttons": [
-                  {
-                    "text": "Add (Approve)",
-                    "additionalFields": {
-                      "callback_data": "Add"
-                    }
-                  },
-                  {
-                    "text": "Discard (Blacklist)",
-                    "additionalFields": {
-                      "callback_data": "=discard"
-                    }
-                  },
-                  {
-                    "text": "Done (Exit)",
-                    "additionalFields": {
-                      "callback_data": "done|exit"
-                    }
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        112,
-        288
-      ],
-      "id": "98637a9d-cc75-4317-8cd5-4c7c26d95ddb",
-      "name": "Send a text message4",
-      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
-      "credentials": {
-        "telegramApi": {
-          "id": "u8uZvnn7mHZOOIZS",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "id": "44c04279-827c-4df1-8cf5-d92d2e1ceb1e",
-              "name": "target",
-              "value": "={{ $('Aggregate1').item.json.queue[1].original_prompt }}",
-              "type": "string"
-            },
-            {
-              "id": "35ce22f4-55b0-45fb-88b8-ba041156da7f",
-              "name": "max_result",
-              "value": "={{ $('Aggregate1').item.json.queue[1].batch_total }}",
-              "type": "string"
-            }
-          ]
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        -16,
-        0
-      ],
-      "id": "53cf88e9-520a-4e2a-b34d-15429cb12674",
-      "name": "Edit Fields2"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "a1d4ecf8-2d52-4db9-9a87-6b068ecacf50",
-              "leftValue": "={{ $('Aggregate1').item.json.queue[1] }}",
-              "rightValue": "=",
-              "operator": {
-                "type": "object",
-                "operation": "exists",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        528,
-        -256
-      ],
-      "id": "1374a65b-eef3-4e44-9d4b-941ab72f2a08",
-      "name": "If"
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "c8bc33fc-d1a8-488a-8160-6e8583a4b125",
-              "leftValue": "={{ $json.queue[1] }}",
-              "rightValue": "",
-              "operator": {
-                "type": "object",
-                "operation": "exists",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -1056,
-        160
-      ],
-      "id": "724b2380-fc4b-42c8-b320-197b24e7537d",
-      "name": "If1"
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
-        "text": "All done!",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        800,
-        -224
-      ],
-      "id": "29166f19-f1e5-4c16-a394-9758e5233f29",
-      "name": "Send a text message5",
-      "webhookId": "f7fe048f-3a7f-448f-ad4d-dd407dc764f4",
-      "credentials": {
-        "telegramApi": {
-          "id": "u8uZvnn7mHZOOIZS",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
         "operation": "deleteMessage",
         "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
         "messageId": "={{ $('Telegram Trigger').item.json.callback_query.message.message_id }}"
@@ -1066,68 +271,12 @@
       "type": "n8n-nodes-base.telegram",
       "typeVersion": 1.2,
       "position": [
-        352,
-        -256
+        256,
+        -480
       ],
       "id": "0b49c220-7b0c-4e3b-9d24-ceef72fb67f0",
       "name": "Delete a chat message",
       "webhookId": "fef2b727-322b-4b26-adc4-e549b4f1f371",
-      "credentials": {
-        "telegramApi": {
-          "id": "u8uZvnn7mHZOOIZS",
-          "name": "Telegram account"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "bdc4ce2f-1aad-4f25-aec3-312d44ae78ac",
-              "leftValue": "={{ $('Call_back or Message').item.json.queue[0] }}",
-              "rightValue": "",
-              "operator": {
-                "type": "object",
-                "operation": "notEmpty",
-                "singleValue": true
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -240,
-        288
-      ],
-      "id": "31c754c0-7c72-427f-9f28-90c63ff9a186",
-      "name": "If2"
-    },
-    {
-      "parameters": {
-        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
-        "text": "All done!",
-        "additionalFields": {}
-      },
-      "type": "n8n-nodes-base.telegram",
-      "typeVersion": 1.2,
-      "position": [
-        -48,
-        368
-      ],
-      "id": "f0a9e5fb-bf2f-467f-8e0c-3b8820368e31",
-      "name": "Send a text message6",
-      "webhookId": "f7fe048f-3a7f-448f-ad4d-dd407dc764f4",
       "credentials": {
         "telegramApi": {
           "id": "u8uZvnn7mHZOOIZS",
@@ -1159,8 +308,8 @@
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
       "position": [
-        -896,
-        304
+        -1040,
+        64
       ],
       "id": "e784e533-0223-439b-854b-7cfe889f4cef",
       "name": "Swap Queue"
@@ -1179,13 +328,13 @@
                 },
                 "conditions": [
                   {
+                    "id": "b669820d-8209-44ed-b038-db132fb139be",
                     "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
-                    "rightValue": "/scrape",
+                    "rightValue": "/review",
                     "operator": {
                       "type": "string",
                       "operation": "startsWith"
-                    },
-                    "id": "febc63b0-06f3-4790-b781-3a72b7a1c6f9"
+                    }
                   }
                 ],
                 "combinator": "and"
@@ -1201,13 +350,13 @@
                 },
                 "conditions": [
                   {
-                    "id": "b669820d-8209-44ed-b038-db132fb139be",
                     "leftValue": "={{ $('Telegram Trigger').item.json.message.text }}",
-                    "rightValue": "/review",
+                    "rightValue": "/scrape",
                     "operator": {
                       "type": "string",
                       "operation": "startsWith"
-                    }
+                    },
+                    "id": "febc63b0-06f3-4790-b781-3a72b7a1c6f9"
                   }
                 ],
                 "combinator": "and"
@@ -1243,41 +392,11 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -464,
-        128
+        -656,
+        608
       ],
       "id": "c79a004b-7527-49a5-82fe-6ca91686f496",
       "name": "Commands"
-    },
-    {
-      "parameters": {
-        "operation": "get",
-        "tableId": "leads",
-        "filters": {
-          "conditions": [
-            {
-              "keyName": "status",
-              "keyValue": "new"
-            }
-          ]
-        }
-      },
-      "type": "n8n-nodes-base.supabase",
-      "typeVersion": 1,
-      "position": [
-        -1616,
-        160
-      ],
-      "id": "fafd1430-e355-4c52-b0d9-46f3dbf517d5",
-      "name": "Get New Leads",
-      "alwaysOutputData": true,
-      "credentials": {
-        "supabaseApi": {
-          "id": "kV2CfQktaTJstCXH",
-          "name": "Supabase account"
-        }
-      },
-      "onError": "continueRegularOutput"
     },
     {
       "parameters": {
@@ -1336,11 +455,1856 @@
       "type": "n8n-nodes-base.switch",
       "typeVersion": 3.4,
       "position": [
-        -752,
+        -880,
         160
       ],
       "id": "cc3410d7-3546-47ac-b792-b4beb6fcb119",
       "name": "Call_back or Message"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2512,
+        704
+      ],
+      "id": "59867e00-31fc-484c-8a5a-422a84a91468",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "name"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        2016,
+        144
+      ],
+      "id": "eed1e7d7-3c27-4a2c-b923-1f1e1e7439ed",
+      "name": "Summarize"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "place_id",
+              "condition": "eq",
+              "keyValue": "={{ $('Call_back or Message').item.json.queue[0].place_id }}"
+            }
+          ]
+        },
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "status",
+              "fieldValue": "blacklist"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -272,
+        -272
+      ],
+      "id": "68d0bf10-2a5e-4e31-991e-173437bad2f1",
+      "name": "Update a row1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4b5b4af9-0e5c-4b5e-918b-d7668e8568b0",
+              "leftValue": "={{ $json.instagram[0].username }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3680,
+        640
+      ],
+      "id": "d97b112c-24aa-432b-b91e-e4c8a6c5338f",
+      "name": "Has IG Profile?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "28ae1e2b-fe19-45f9-91c9-91b76da2fcd4",
+              "leftValue": "={{ $json.current_lead[0].facebook_url }}",
+              "rightValue": "=facebook.com",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3088,
+        544
+      ],
+      "id": "34ff3e9c-88f6-43f4-8652-a50c8e04d99a",
+      "name": "Has FB Page?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fast-scan:8000/api/audit/evaluate",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        4720,
+        432
+      ],
+      "id": "8a17d3f2-df23-42a3-a752-3e38b3743b87",
+      "name": "Evaluate Lead (Groq)1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fast-scan:8000/api/audit/website",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"url\": \"{{ $json.current_lead[0].website }}\"\n}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3280,
+        304
+      ],
+      "id": "db3b9dfa-c000-4011-9dae-d6bd486d567e",
+      "name": "HTTP Request to Web Scraper1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.groq.com/openai/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"meta-llama/llama-4-scout-17b-16e-instruct\",\n  \"temperature\": 0.3,\n  \"max_tokens\": 1000,\n  \"messages\": [\n    {\n      \"role\": \"system\",\n      \"content\": \"You are a website quality auditor for a digital marketing agency. Analyze the provided website data and screenshots. Return a JSON object with these fields:\\n\\n- overall_score (0-100): overall website quality\\n- design_score (0-100): visual design and professionalism\\n- functionality_score (0-100): navigation, CTAs, forms\\n- seo_score (0-100): meta tags, structured data, SSL\\n- mobile_readiness (0-100): viewport meta, responsive indicators\\n- summary (string): 2-3 sentence assessment\\n- top_issues (array of strings): top 3 problems found\\n- recommendation (string): what you'd pitch this business\\n\\nReturn ONLY valid JSON, no markdown, no explanation.\"\n    },\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"Audit this website: {{ $json.resolved_url }}\\n\\nTechnical signals:\\n- SSL: {{ $json.technical.has_ssl }}\\n- Title length: {{ $json.technical.title_length }}\\n- Has meta description: {{ $json.technical.has_meta_description }}\\n- Has viewport meta: {{ $json.technical.has_viewport_meta }}\\n- CTA count: {{ $json.technical.cta_count }}\\n- Has contact form: {{ $json.technical.has_contact_form }}\\n- Has phone number: {{ $json.technical.has_phone_number }}\\n- Has email: {{ $json.technical.has_email }}\\n- Nav items: {{ $json.technical.nav_item_count }}\\n- Structured data: {{ $json.technical.has_structured_data }}\\n- Page load time: {{ $json.performance.page_load_time_ms }}ms\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:image/jpeg;base64,{{ $json.screenshots.hero }}\"\n          }\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:image/jpeg;base64,{{ $json.screenshots.mid }}\"\n          }\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"data:image/jpeg;base64,{{ $json.screenshots.footer }}\"\n          }\n        }\n      ]\n    }\n  ]\n}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3600,
+        384
+      ],
+      "id": "93699c90-0595-45ca-9c05-54548ee985b4",
+      "name": "Groq Vision Analysis1",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "kN7WPWF0oidVXhRI",
+          "name": "Header Auth account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://fast-scan:8000/api/audit/footprint",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"business_name\": \"={{ $json.current_lead[0].name }}\",\n  \"address\": \"={{ $json.current_lead[0].address }}\",\n  \"facebook_url\": \"={{ $json.current_lead[0].website }}\"\n}",
+        "options": {
+          "timeout": 80000
+        }
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3664,
+        880
+      ],
+      "id": "551be78a-fad4-40e6-8be2-2d1c23ba6aa1",
+      "name": "Qualitative Audit1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~instagram-followers-count-scraper/run-sync-get-dataset-items?",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "apifyApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"usernames\": [\"{{ $('Apify - FB Page Scraper1').item.json.instagram[0].username }}\"]\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3856,
+        544
+      ],
+      "id": "415aa350-23cd-4b37-ab87-0324ed06fedc",
+      "name": "Apify - IG Profile Scraper1",
+      "credentials": {
+        "apifyApi": {
+          "id": "lsBeXPKZ2UssBSOu",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.apify.com/v2/acts/apify~facebook-pages-scraper/run-sync-get-dataset-items?",
+        "authentication": "predefinedCredentialType",
+        "nodeCredentialType": "apifyApi",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"startUrls\": [\n    {\n      \"url\": \"{{ $json.current_lead[0].facebook_url }}\"\n    }\n  ],\n  \"maxPagesPerQuery\": 1,\n  \"maxReviews\": 0,\n  \"scrapeAbout\": true,\n  \"scrapeReviews\": false\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        3312,
+        544
+      ],
+      "id": "ebf47e89-8e98-4e4b-8544-69f9a1da20fb",
+      "name": "Apify - FB Page Scraper1",
+      "credentials": {
+        "apifyApi": {
+          "id": "lsBeXPKZ2UssBSOu",
+          "name": "Apify account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "let ig = {};\n\ntry {\n  const item = $input.first();\n  const d = item.json;\n  if (d && !d.error && d.followersCount !== undefined) {\n    ig = d;\n  }\n} catch(e) {\n  ig = {};\n}\n\nconst hasData = Object.keys(ig).length > 0;\n\n// Reference the correct node names from your workflow\nlet fbData = null;\ntry { fbData = $('FB Scraper Format1').first().json; } catch(e) {}\ntry { if (!fbData || !fbData.source) fbData = $('FB Null1').first().json; } catch(e) {}\n\nreturn [{\n  json: {\n    source:         \"instagram\",\n    userName:       ig.userName        ?? null,\n    followersCount: ig.followersCount  ?? null,\n    followsCount:   ig.followsCount    ?? null,\n    userUrl:        ig.userUrl         ?? null,\n    _ig_available:  hasData,\n    _fb_data:       fbData\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4016,
+        528
+      ],
+      "id": "a69dfe43-4d8f-48c3-a089-484f68d13cc0",
+      "name": "IG Scraper Format1"
+    },
+    {
+      "parameters": {
+        "jsCode": "let fb = {};\n\ntry {\n  const item = $input.first();\n  const d = item.json;\n  if (d && !d.error) {\n    fb = d;\n  }\n} catch(e) {\n  fb = {};\n}\n\nconst hasData = !!(fb.followers || fb.likes || fb.email || fb.phone);\n\nreturn [{\n  json: {\n    source: \"facebook\",\n    followers:     fb.followers     ?? null,\n    likes:         fb.likes         ?? null,\n    phone:         fb.phone         ?? null,\n    email:         fb.email         ?? null,\n    rating:        fb.rating        ?? null,\n    ratingOverall: fb.ratingOverall ?? null,\n    ratingCount:   fb.ratingCount   ?? null,\n    address:       fb.address       ?? null,\n    services:      fb.services      ?? null,\n    ad_status:     fb.ad_status     ?? null,\n    creation_date: fb.creation_date ?? null,\n    category:      fb.category      ?? null,\n    instagram:     fb.instagram     ?? null,\n    _fb_available: hasData\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3472,
+        544
+      ],
+      "id": "b95eb3f4-45ca-446f-a43e-2e1dcf12b33f",
+      "name": "FB Scraper Format1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Code in JavaScript1 — Website Audit Format\nlet auditData = null;\n\ntry {\n  const item = $input.first();\n  const d = item.json;\n\n  // Parse Result gives us audit_result as an object\n  const raw = d.audit_result ?? d;\n\n  if (raw && raw.overall_score !== undefined && raw.overall_score !== null) {\n    auditData = {\n      overall_score:       raw.overall_score       ?? null,\n      design_score:        raw.design_score        ?? null,\n      functionality_score: raw.functionality_score ?? null,\n      seo_score:           raw.seo_score           ?? null,\n      mobile_readiness:    raw.mobile_readiness    ?? null,\n      summary:             raw.summary             ?? null,\n      top_issues:          raw.top_issues          ?? null,\n      recommendation:      raw.recommendation      ?? null\n    };\n  }\n} catch(e) {\n  auditData = null;\n}\n\nreturn [{\n  json: {\n    source: \"website_audit\",\n    audit_result: auditData,\n    website_url: (() => {\n      try { return $('Test Lead Data').first().json.website_url || null; }\n      catch(e) { return null; }\n    })(),\n    _audit_available: auditData !== null\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4016,
+        384
+      ],
+      "id": "8e6db599-fef7-4890-942f-421efee60b1b",
+      "name": "Audit Fail1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// IG Null — no instagram found\n// Still grab FB data so Merge gets everything\nlet fbData = null;\ntry { fbData = $('FB Scraper Format1').first().json; } catch(e) {}\ntry { if (!fbData || !fbData.source) fbData = $('FB Null1').first().json; } catch(e) {}\n\nreturn [{\n  json: {\n    source: \"instagram\",\n    userName:       null,\n    followersCount: null,\n    followsCount:   null,\n    userUrl:        null,\n    _ig_available:  false,\n    _fb_data:       fbData\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4016,
+        672
+      ],
+      "id": "45e352ee-1a53-4cf5-bcf7-1c670e3d3275",
+      "name": "IG Null1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// FB Data = Null — no Facebook page exists\nreturn [{\n  json: {\n    source: \"facebook\",\n    followers: null,\n    likes: null,\n    phone: null,\n    email: null,\n    rating: null,\n    ratingOverall: null,\n    ratingCount: null,\n    address: null,\n    services: null,\n    ad_status: null,\n    creation_date: null,\n    category: null,\n    instagram: null,\n    _fb_available: false\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3488,
+        688
+      ],
+      "id": "f427bec0-bdfe-43d3-9896-030ae21678f8",
+      "name": "FB Null1"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Qualitative Format\nlet q = {};\n\ntry {\n  const item = $input.first();\n  const d = item.json;\n\n  // Gemini endpoint returns these directly in the response\n  // Could be at root level or nested — check both\n  if (d) {\n    // If your /api/audit/footprint returns fields at root level:\n    if (d.vibe_analysis || d.business_name || d.key_offerings) {\n      q = d;\n    }\n    // If it returns an error or non-standard shape, q stays empty\n  }\n} catch(e) {\n  q = {};\n}\n\nconst hasData = !!(q.vibe_analysis || q.key_offerings);\n\nreturn [{\n  json: {\n    source: \"qualitative\",\n    business_name:         q.business_name          ?? null,\n    vibe_analysis:         q.vibe_analysis          ?? null,\n    key_offerings:         q.key_offerings          ?? null,\n    customer_pain_points:  q.customer_pain_points   ?? null,\n    digital_presence_gaps: q.digital_presence_gaps  ?? null,\n    sentiment_summary:     q.sentiment_summary      ?? null,\n    confidence_score:      q.confidence_score       ?? null,\n    _qualitative_available: hasData\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4016,
+        864
+      ],
+      "id": "5f2bb72f-d6a7-4419-8b54-a8312a926b79",
+      "name": "Qualitative Format1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76af1fd5-8161-49ff-a189-11b8d6e837e0",
+              "name": "target",
+              "value": "={{ $json.target }}",
+              "type": "string"
+            },
+            {
+              "id": "baf087e3-d6e2-4f4c-8e12-1b9c1c70d563",
+              "name": "offset",
+              "value": "={{ $json.offset }}",
+              "type": "number"
+            },
+            {
+              "id": "79a55638-0659-4b51-b3fe-6cb433831139",
+              "name": "message_id",
+              "value": "={{ $json.message_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        192,
+        576
+      ],
+      "id": "b99f5ef5-9d07-4f00-87ea-3ffc945274aa",
+      "name": "Original Prompts"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Original Prompts').item.json.message_id }}",
+        "text": "=AI has approved:\n{{ $json.data.map(item => item.business_name).join(', ') }}\n\nWhat would you like to do next?\n",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Review",
+                    "additionalFields": {
+                      "callback_data": "review"
+                    }
+                  },
+                  {
+                    "text": "Scan More",
+                    "additionalFields": {
+                      "callback_data": "=more"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2944,
+        384
+      ],
+      "id": "7d998040-dae2-452b-95a4-45b437156ae1",
+      "name": "Review or More",
+      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Original Prompts').item.json.message_id }}",
+        "text": "=Found {{ $json.count_name }} leads. Reviewing them now — this takes about {{ $json.count_name }} minute(s). I'll update you as each one finishes.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2160,
+        144
+      ],
+      "id": "f3ede954-0200-4bad-9879-33d063f943fe",
+      "name": "Found Leads",
+      "webhookId": "e482430d-a8f8-4284-9635-9bfd4ce25c92",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $json.message_id }}",
+        "text": "=Searching for leads on \"{{ $json.target }}\"...",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        -32
+      ],
+      "id": "e8ab9d64-7a5a-44bd-9ebd-d0dfbbd7e419",
+      "name": "Scanning",
+      "webhookId": "e482430d-a8f8-4284-9635-9bfd4ce25c92",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Target was not specified.\n\nPlease use /scrape {target}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        480,
+        -144
+      ],
+      "id": "ad113d39-0c11-4ca9-a989-3d7c5eb255e0",
+      "name": "Target Error",
+      "webhookId": "e482430d-a8f8-4284-9635-9bfd4ce25c92",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "=No more leads to Review. \n\nAll done!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        16,
+        -48
+      ],
+      "id": "f0a9e5fb-bf2f-467f-8e0c-3b8820368e31",
+      "name": "Empty Review",
+      "webhookId": "f7fe048f-3a7f-448f-ad4d-dd407dc764f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+        "text": "=Welcome to your Lead Gen Bot.\n\nHere's what you can do:\n\n/scrape {target} — Search for leads based on a target. AI reviews each one and returns the approved results.\n\n/review — Go through leads waiting for your approval, one at a time.\n\n/status — See a quick summary of your current pipeline.\n\nRun /scrape to get started.",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -448,
+        672
+      ],
+      "id": "fcbbdd1c-c8c3-449f-91da-1a497b4fa1c4",
+      "name": "Welcome",
+      "webhookId": "e482430d-a8f8-4284-9635-9bfd4ce25c92",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "All done!",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        -496
+      ],
+      "id": "29166f19-f1e5-4c16-a394-9758e5233f29",
+      "name": "All Done",
+      "webhookId": "f7fe048f-3a7f-448f-ad4d-dd407dc764f4",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "f91c536b-54a3-4120-ae51-acbf856bdc7e",
+              "name": "action",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.data }}",
+              "type": "string"
+            },
+            {
+              "id": "22ec21f3-baa4-40e0-af13-877732f12a48",
+              "name": "chat_id",
+              "value": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -640,
+        -112
+      ],
+      "id": "8e9f1982-2aa0-421d-9d11-327dd49fb1c3",
+      "name": "Action/Chat_ID"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "44c04279-827c-4df1-8cf5-d92d2e1ceb1e",
+              "name": "target",
+              "value": "={{ $('Build review queue').item.json.queue[1].original_prompt }}",
+              "type": "string"
+            },
+            {
+              "id": "7ad61ac7-d2d5-4793-95a4-4230c6ccdf46",
+              "name": "offset",
+              "value": "={{ $('Build review queue').item.json.queue[0].batch_total }}",
+              "type": "number"
+            },
+            {
+              "id": "f58f629c-7bfe-4840-8718-c5f77993b6d5",
+              "name": "message_id",
+              "value": "={{ $('Action/Chat_ID').item.json.chat_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        64,
+        432
+      ],
+      "id": "53cf88e9-520a-4e2a-b34d-15429cb12674",
+      "name": "Target(DB) & Offset"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e252fe95-7e03-4796-9f75-2d87fccf8a23",
+              "name": "target",
+              "value": "={{ $('Telegram Trigger').item.json.message.text.split(' ').slice(1).join(' ') }} ",
+              "type": "string"
+            },
+            {
+              "id": "d99fc876-98c8-4f06-9f50-96cad4e29d3f",
+              "name": "offset",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "5d27da30-ef03-46fd-80bf-72a3201538a1",
+              "name": "message_id",
+              "value": "={{ $('Telegram Trigger').item.json.message.chat.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -320,
+        544
+      ],
+      "id": "0deb606c-9d15-44e0-85f2-ce0e7c3318d6",
+      "name": "Target(TG) & Offset"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "1946a725-28ed-4b31-98ca-25b414b92bfb",
+              "leftValue": "={{ $json.target }}",
+              "rightValue": " ",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        464,
+        512
+      ],
+      "id": "e23d8fac-a966-45cc-8fb4-4da44ef0e680",
+      "name": "Target exist?"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "tableId": "leads",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "status",
+              "keyValue": "new"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        -1664,
+        160
+      ],
+      "id": "fafd1430-e355-4c52-b0d9-46f3dbf517d5",
+      "name": "Get Previous 'New' Leads",
+      "alwaysOutputData": true,
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "maxItems": 2,
+        "keep": "lastItems"
+      },
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        -1520,
+        160
+      ],
+      "id": "9ad338f8-0664-4cb0-b0d1-57fa8687e6ef",
+      "name": "Limit 2 latest"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c8bc33fc-d1a8-488a-8160-6e8583a4b125",
+              "leftValue": "={{ $json.queue[1] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -1216,
+        160
+      ],
+      "id": "724b2380-fc4b-42c8-b320-197b24e7537d",
+      "name": "2 current leads?"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e009ca44-5d5e-4b0f-9dcd-6369874b8064",
+              "name": "business_name",
+              "value": "={{ $json.identity.business_name }}",
+              "type": "string"
+            },
+            {
+              "id": "916c16e4-36e3-4918-adca-9282e81f7970",
+              "name": "address",
+              "value": "={{ $json.current_lead[0].address }}",
+              "type": "string"
+            },
+            {
+              "id": "464e495e-1e20-4730-9fb4-0f8fdd40f132",
+              "name": "category",
+              "value": "={{ $json.identity.category }}",
+              "type": "string"
+            },
+            {
+              "id": "9d29256f-ac73-4479-81fb-3674d5e5e314",
+              "name": "email",
+              "value": "={{ $json.contacts.email }}",
+              "type": "string"
+            },
+            {
+              "id": "6b75143b-fb87-4fc6-abe5-f0fd45db7cda",
+              "name": "phone",
+              "value": "={{ $json.current_lead[0].phone }}",
+              "type": "string"
+            },
+            {
+              "id": "d16b1a25-e382-420a-afd1-35cb12bc3973",
+              "name": "facebook_url",
+              "value": "={{ $json.contacts.facebook_url }}",
+              "type": "string"
+            },
+            {
+              "id": "a5e46644-de4b-471a-818a-5159d640319e",
+              "name": "instagram_url",
+              "value": "={{ $json.contacts.instagram_url }}",
+              "type": "string"
+            },
+            {
+              "id": "2edee3c0-d2b8-48c2-b63d-eb09b498be1a",
+              "name": "website_url",
+              "value": "={{ $json.current_lead[0].website }}",
+              "type": "string"
+            },
+            {
+              "id": "9e20516f-19fa-46fa-8899-f71e7cdf12e5",
+              "name": "fb_followers",
+              "value": "={{ $json.snapshot.fb_followers }}",
+              "type": "number"
+            },
+            {
+              "id": "7973d2a3-e26d-4e45-9f2b-a7a56541d2c8",
+              "name": "ig_followers",
+              "value": "={{ $json.snapshot.ig_followers }}",
+              "type": "string"
+            },
+            {
+              "id": "46607445-a7f2-4f53-95d6-09e18036b4f4",
+              "name": "website_score",
+              "value": "={{ $json.score_breakdown.website_need.score }}",
+              "type": "number"
+            },
+            {
+              "id": "5614f821-8754-44be-95c1-f917e7f1cf3a",
+              "name": "agent_fit_score",
+              "value": "={{ $json.agency_fit_score }}",
+              "type": "number"
+            },
+            {
+              "id": "a942689a-3331-490b-a588-339fd7d80f9b",
+              "name": "priority_level",
+              "value": "={{ $json.priority_level }}",
+              "type": "string"
+            },
+            {
+              "id": "65177a73-8f9c-4e1f-9361-7a516a1059c5",
+              "name": "service_to_offer",
+              "value": "={{ $json.services_to_offer }}",
+              "type": "array"
+            },
+            {
+              "id": "4e511ec8-cbf8-4b65-8bf7-8edeec950a15",
+              "name": "pitch_angle",
+              "value": "={{ $json.pitch_angle }}",
+              "type": "string"
+            },
+            {
+              "id": "68e775da-2b34-40a0-ac42-88a02aa92239",
+              "name": "the_reasoning",
+              "value": "={{ $json.the_reasoning }}",
+              "type": "string"
+            },
+            {
+              "id": "ebd6baa9-2d29-4f89-924b-139627f879f7",
+              "name": "digital_gaps",
+              "value": "={{ $json.digital_gaps }}",
+              "type": "array"
+            },
+            {
+              "id": "f64fde7f-b463-44f9-acee-38da27e0e7e1",
+              "name": "original_prompt",
+              "value": "={{ $('Original Prompts').item.json.target }}",
+              "type": "string"
+            },
+            {
+              "id": "b7288f2f-2570-4a1d-91b3-dc8efd502475",
+              "name": "batch_total",
+              "value": "={{ $('Original Prompts').item.json.offset + 5 }}",
+              "type": "number"
+            },
+            {
+              "id": "c8f1cbc2-4955-4fd3-9a6d-5823fc001275",
+              "name": "place_id",
+              "value": "={{ $json.current_lead[0].place_id }}",
+              "type": "string"
+            },
+            {
+              "id": "727fd743-0d30-4e5d-9608-095aa142e564",
+              "name": "description",
+              "value": "={{ $json.description }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4832,
+        992
+      ],
+      "id": "350e6dcb-a673-4014-9ec9-746cc5148fc8",
+      "name": "Clean messy data"
+    },
+    {
+      "parameters": {
+        "tableId": "leads",
+        "fieldsUi": {
+          "fieldValues": [
+            {
+              "fieldId": "business_name",
+              "fieldValue": "={{ $json.business_name }}"
+            },
+            {
+              "fieldId": "address",
+              "fieldValue": "={{ $json.address }}"
+            },
+            {
+              "fieldId": "category",
+              "fieldValue": "={{ $json.category }}"
+            },
+            {
+              "fieldId": "email",
+              "fieldValue": "={{ $json.email }}"
+            },
+            {
+              "fieldId": "phone",
+              "fieldValue": "={{ $json.phone }}"
+            },
+            {
+              "fieldId": "facebook_url",
+              "fieldValue": "={{ $json.facebook_url }}"
+            },
+            {
+              "fieldId": "instagram_url",
+              "fieldValue": "={{ $json.instagram_url }}"
+            },
+            {
+              "fieldId": "website_url",
+              "fieldValue": "={{ $json.website_url }}"
+            },
+            {
+              "fieldId": "fb_followers",
+              "fieldValue": "={{ $json.fb_followers }}"
+            },
+            {
+              "fieldId": "ig_followers",
+              "fieldValue": "={{ $json.ig_followers }}"
+            },
+            {
+              "fieldId": "website_score",
+              "fieldValue": "={{ $json.website_score }}"
+            },
+            {
+              "fieldId": "agency_fit_score",
+              "fieldValue": "={{ $json.agent_fit_score }}"
+            },
+            {
+              "fieldId": "priority_level",
+              "fieldValue": "={{ $json.priority_level }}"
+            },
+            {
+              "fieldId": "services_to_offer",
+              "fieldValue": "={{ $json.service_to_offer }}"
+            },
+            {
+              "fieldId": "pitch_angle",
+              "fieldValue": "={{ $json.pitch_angle }}"
+            },
+            {
+              "fieldId": "the_reasoning",
+              "fieldValue": "={{ $json.the_reasoning }}"
+            },
+            {
+              "fieldId": "digital_gaps",
+              "fieldValue": "={{ $json.digital_gaps }}"
+            },
+            {
+              "fieldId": "status",
+              "fieldValue": "new"
+            },
+            {
+              "fieldId": "original_prompt",
+              "fieldValue": "={{ $json.original_prompt }}"
+            },
+            {
+              "fieldId": "batch_total",
+              "fieldValue": "={{ $json.batch_total }}"
+            },
+            {
+              "fieldId": "description",
+              "fieldValue": "={{ $json.description }}"
+            },
+            {
+              "fieldId": "place_id",
+              "fieldValue": "={{ $json.place_id }}"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.supabase",
+      "typeVersion": 1,
+      "position": [
+        5008,
+        992
+      ],
+      "id": "2e990813-9ad5-4412-87de-fe9b0663c3b6",
+      "name": "save as 'new' in db",
+      "credentials": {
+        "supabaseApi": {
+          "id": "kV2CfQktaTJstCXH",
+          "name": "Supabase account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "8fd1315d-5273-4528-8bcd-e42f10708410",
+              "name": "target",
+              "value": "={{ $('Original Prompts').item.json.target }}",
+              "type": "string"
+            },
+            {
+              "id": "6175de04-6c12-48fe-8589-7968a96bdd9a",
+              "name": "offset",
+              "value": "={{ $('Original Prompts').item.json.offset + 5}}",
+              "type": "number"
+            },
+            {
+              "id": "51324a38-f2cb-4c0e-8ea6-e46c81bf3489",
+              "name": "message_id",
+              "value": "={{ $('Original Prompts').item.json.message_id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2128,
+        1072
+      ],
+      "id": "10b656cd-4ca4-4797-b3f2-a350e1fcfc5e",
+      "name": "Scrape new batch"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "place_id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        912
+      ],
+      "id": "d8ce6c53-dcb4-41d2-acbf-6966cc796769",
+      "name": "Count 'duplicate'"
+    },
+    {
+      "parameters": {
+        "fieldsToSummarize": {
+          "values": [
+            {
+              "field": "place_id"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.summarize",
+      "typeVersion": 1.1,
+      "position": [
+        1552,
+        1056
+      ],
+      "id": "8b181c6a-47df-4354-b889-a53bfcbe8023",
+      "name": "Count 'corporate'"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bdc4ce2f-1aad-4f25-aec3-312d44ae78ac",
+              "leftValue": "={{ $('Call_back or Message').item.json.queue[0] }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -176,
+        -48
+      ],
+      "id": "31c754c0-7c72-427f-9f28-90c63ff9a186",
+      "name": "Review exist?"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.callback_query.message.chat.id }}",
+        "text": "=**NEW LEAD**: {{ $('Call_back or Message').item.json.queue[0].business_name }}\n\n**AI Description / Summary:**\n{{ $('Call_back or Message').item.json.queue[1].description }}\n\n**Pitch angle:**\n{{ $('Call_back or Message').item.json.queue[0].pitch_angle }}\n\n\nWhat would you like to do?",
+        "replyMarkup": "inlineKeyboard",
+        "inlineKeyboard": {
+          "rows": [
+            {
+              "row": {
+                "buttons": [
+                  {
+                    "text": "Add (Approve)",
+                    "additionalFields": {
+                      "callback_data": "add"
+                    }
+                  },
+                  {
+                    "text": "Discard (Blacklist)",
+                    "additionalFields": {
+                      "callback_data": "=discard"
+                    }
+                  },
+                  {
+                    "text": "Done (Exit)",
+                    "additionalFields": {
+                      "callback_data": "done"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        48,
+        -320
+      ],
+      "id": "d5ece116-0ede-487d-aeb9-c4e7cc5a6654",
+      "name": "New Lead",
+      "webhookId": "7d1e081f-67f4-4437-a254-a402f1eaf98d",
+      "credentials": {
+        "telegramApi": {
+          "id": "u8uZvnn7mHZOOIZS",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "a1d4ecf8-2d52-4db9-9a87-6b068ecacf50",
+              "leftValue": "={{ $('Build review queue').item.json.queue[1] }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "object",
+                "operation": "notExists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -112,
+        -368
+      ],
+      "id": "1374a65b-eef3-4e44-9d4b-941ab72f2a08",
+      "name": "Next lead exist?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "de526f92-d3af-44ff-ad89-652388ec968f",
+              "leftValue": "={{ $json.data[0].count_place_id + $json.data[1].count_place_id }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "f9b2dee2-5b33-4c83-aa00-dbce06064d23",
+              "leftValue": "={{ $json.data[0].count_place_id }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            },
+            {
+              "id": "f0e7ef5d-3c2a-4850-935b-bf42a3c5dfed",
+              "leftValue": "={{ $json.data[1].count_place_id }}",
+              "rightValue": 5,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        2112,
+        880
+      ],
+      "id": "2b4b9bb5-03bc-41aa-9a5b-30e376f46ded",
+      "name": "More than 5?"
+    },
+    {
+      "parameters": {
+        "content": "📥 ENTRY POINT\n─────────────────────────────\nTelegram bot receives all incoming events.\n\n- \"Call_back or Message\" detects whether the\n  event is an inline button press (callback_query)\n  or a typed message.\n\n- Routes to the correct handling branch before\n  any command logic runs.",
+        "height": 896,
+        "width": 1152,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -1888,
+        -224
+      ],
+      "id": "09a986cf-fbfa-4b74-901c-b58f6a1ccec7",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "add",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4a68c734-13ce-4d6b-a0b5-7b75a69da32a"
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "9fff82b2-b8df-4e6b-830f-b910340a4cc1",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "discard",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "b933a39d-600a-44b7-9669-50dd30ef8ac8",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "review",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "f6930b11-07dd-4a69-b061-90e8c2d2428b",
+                    "leftValue": "={{ $json.action }}",
+                    "rightValue": "more",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              }
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -496,
+        -160
+      ],
+      "id": "e2c00530-25a3-4f8c-8146-e64e7b9c32f7",
+      "name": "Which callback?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "f68e9ecb-7070-4ca0-8f4f-6fb4855a3100",
+              "leftValue": "={{ $json.current_lead[0].website }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3104,
+        208
+      ],
+      "id": "c99d77fd-7b5f-413c-89de-f3e92ce96e26",
+      "name": "Has website URL?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "450a2809-62f1-4f8d-8b9a-3daaec857355",
+              "leftValue": "={{ $json.ai_status }}",
+              "rightValue": "Valid",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        1984,
+        304
+      ],
+      "id": "4903b58f-9197-4d9a-bcfc-c37d6d3f3ccf",
+      "name": "Valid or Corporate?"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "queue",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -1376,
+        160
+      ],
+      "id": "8c35595d-8765-483d-bd0e-3449558e38f6",
+      "name": "Build review queue"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "destinationFieldName": "current_lead",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2880,
+        720
+      ],
+      "id": "bca8b48b-e9d5-4427-8585-05b35f8b3cfd",
+      "name": "Collect current lead"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "business_name, description",
+        "options": {
+          "includeBinaries": false
+        }
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2768,
+        384
+      ],
+      "id": "0d343852-1ff8-4f91-97d0-ae70478b44b5",
+      "name": "Collect lead summaries"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        1952,
+        1008
+      ],
+      "id": "9c720a22-9fd1-4f31-9574-3c4155fcd285",
+      "name": "Collect batch counts"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1760,
+        992
+      ],
+      "id": "86286b24-f81c-4e6b-9dd9-deaa9d0dd610",
+      "name": "Merge duplicate + corporate counts"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineAll",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        5024,
+        672
+      ],
+      "id": "e7aecef1-6dca-4364-b634-55e6c62170b9",
+      "name": "Collect new leads batch"
+    },
+    {
+      "parameters": {
+        "numberInputs": 3
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        4352,
+        384
+      ],
+      "id": "553f2aff-ebef-45a1-a66e-e02a865382d3",
+      "name": "Merge FB + IG + Website data"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1072,
+        512
+      ],
+      "id": "156e3631-688b-4716-8795-65659c1db0e0",
+      "name": "Recombine scrape + DB check"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "54aeba37-b253-4316-a721-66d0bd4fa9e9",
+              "name": "final_leads",
+              "value": "={{ JSON.parse($json.choices[0].message.content).evaluated_leads }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1648,
+        304
+      ],
+      "id": "331632fb-b0f5-474d-8d96-f630d63d273f",
+      "name": "Parse AI batch evaluation"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3dab298e-d41d-4235-88ac-7a268fdf4a7d",
+              "name": "audit_result",
+              "value": "={{ JSON.parse($json.choices[0].message.content.replace(/```json|```/g, '').trim()) }}",
+              "type": "object"
+            },
+            {
+              "id": "6f84f80c-66ae-4252-9aab-54cef574307e",
+              "name": "website_url",
+              "value": "={{ $('Has website URL?').item.json.website }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3760,
+        384
+      ],
+      "id": "96d2478e-baaf-4857-9fbc-a840695e791d",
+      "name": "Parse website audit result"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nlet websiteData = { audit_result: null, website_url: null, _audit_available: false };\nlet igData = { _ig_available: false, _fb_data: null };\nlet qualData = { _qualitative_available: false };\n\nfor (const item of items) {\n  const d = item.json;\n  if (!d || !d.source) continue;\n  if (d.source === \"website_audit\") websiteData = d;\n  if (d.source === \"instagram\") igData = d;\n  if (d.source === \"qualitative\") qualData = d;\n}\n\nconst fbData = igData._fb_data || {};\nconst audit = websiteData.audit_result || {};\n\nlet lead = {};\ntry { lead = $('Test Lead Data').first().json || {}; } catch(e) {}\n\nconst out = {\n    business_name: lead.business_name ?? qualData.business_name ?? null,\n    city: lead.city ?? null,\n    facebook_url: lead.facebook_url ?? null,\n    website_url: lead.website_url || null,\n    place_id: lead.place_id ?? null,\n\n    qualitative: {\n      vibe_analysis: qualData.vibe_analysis ?? null,\n      key_offerings: qualData.key_offerings ?? null,\n      customer_pain_points: qualData.customer_pain_points ?? null,\n      digital_presence_gaps: qualData.digital_presence_gaps ?? null,\n      sentiment_summary: qualData.sentiment_summary ?? null,\n      confidence_score: qualData.confidence_score ?? null\n    },\n\n    quantitative: {\n      facebook: {\n        followers: fbData.followers ?? null,\n        likes: fbData.likes ?? null,\n        email: fbData.email ?? null,\n        phone: fbData.phone ?? null,\n        rating: fbData.rating ?? null,\n        review_count: fbData.ratingCount ?? null,\n        address: fbData.address ?? null,\n        services: fbData.services ?? null,\n        ad_status: fbData.ad_status ?? null,\n        creation_date: fbData.creation_date ?? null,\n        category: fbData.category ?? null\n      },\n      instagram: {\n        username: igData.userName ?? null,\n        followers: igData.followersCount ?? null,\n        follows: igData.followsCount ?? null,\n        profile_url: igData.userUrl ?? null\n      },\n      website: {\n        url: websiteData.website_url || null,\n        overall_score: audit.overall_score ?? null,\n        design_score: audit.design_score ?? null,\n        functionality_score: audit.functionality_score ?? null,\n        seo_score: audit.seo_score ?? null,\n        mobile_readiness: audit.mobile_readiness ?? null,\n        summary: audit.summary ?? null,\n        top_issues: audit.top_issues ?? null,\n        recommendation: audit.recommendation ?? null\n      }\n    }\n};\n\n// This line is the magic fix for \"Circular Structure\" errors\nreturn [{ json: JSON.parse(JSON.stringify(out)) }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4544,
+        416
+      ],
+      "id": "53a32b7a-1655-4fb4-826c-96b3ec29bc3b",
+      "name": "Build master lead payload"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "92d79748-9b3b-494b-8c90-3007be82ff83",
+              "leftValue": "={{ $json.status }}",
+              "rightValue": "success",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3440,
+        288
+      ],
+      "id": "5e920ece-5ebb-4bef-a14d-01b28b6cbe52",
+      "name": "Website audit succeeded?"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{\n  json: {\n    source: \"website_audit\",\n    audit_result: null,\n    website_url:  $input.first().json.current_lead[0].website ?? null,\n    _audit_available: false\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4016,
+        256
+      ],
+      "id": "71a5a095-7788-46a1-b51a-fb62c973dd79",
+      "name": "Pass null website audit"
+    },
+    {
+      "parameters": {
+        "content": "🔀 COMMAND ROUTING\n─────────────────────────────\n\"Commands\" switch handles three bot commands:\n\n- /scrape {target} — kicks off a new lead search.\n  Extracts the target keyword, sets offset = 0,\n  validates the target isn't blank, sends\n  \"Searching…\" to the user.\n\n- /review — loads the current lead queue\n  from Supabase for human review.\n\n- /start — sends the welcome/help message.",
+        "height": 640,
+        "width": 624,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        176
+      ],
+      "id": "477cf097-7b0c-4f14-807a-1e086b1dc33e",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "🔍 LEAD SCRAPING\n─────────────────────────────\nCalls fast-scan /scan-maps with the target\nkeyword. Returns up to 5 results per batch.\n\n- Each result is split into individual items.\n- Supabase RPC (check_lead_exists) flags\n  duplicates before any processing happens.\n- Only leads where duplicate = false continue.\n\nPagination: offset increments by 5 per batch.\nLoop back to this node via \"Set next batch offset\"\nuntil a full batch of 5 new leads is found.",
+        "height": 656,
+        "width": 1008,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        144
+      ],
+      "id": "b6a0561f-3ed0-4f65-9bbb-f656ec7faf6b",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "🤖 AI EVALUATION\n─────────────────────────────\nMaster payload is sent to fast-scan\n/api/audit/evaluate for initial scoring.\n\n\"Valid or Corporate?\" routes the result:\n\n- Valid → Groq Llama 3 scores the lead with:\n  agency fit score, priority level,\n  services to offer, pitch angle,\n  digital gaps, reasoning.\n  Result is parsed and split into individual leads.\n\n- Corporate → Lead is immediately saved to\n  Supabase with status = blacklist.\n  No further review needed.",
+        "height": 672,
+        "width": 1360
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        976,
+        128
+      ],
+      "id": "9c9ed14b-0acb-4741-868b-23f1a9e4dd00",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "🌐 DIGITAL FOOTPRINT AUDIT\n─────────────────────────────\nThree parallel branches run for each lead:\n\n[Facebook branch]\nHas FB Page? → Apify FB scraper\n→ Format FB result / FB Null (if no page)\n\n[Instagram branch]\nHas IG Profile? → Apify IG scraper\n→ Format IG result / IG Null (if no profile)\n\n[Website branch]\nHas website URL? → fast-scan /api/audit/website\n→ Groq Vision Analysis → Qualitative Audit\n→ Format result / Pass null (if audit fails)\n\nAll three branches merge into \"Merge FB + IG +\nWebsite data\", then \"Build master lead payload\"\nassembles the full picture before AI evaluation.\n\n⚠️ \"Wait for Apify rate limit\" (30s) sits before\nthe IG scraper to avoid hitting Apify API limits.",
+        "height": 1136,
+        "width": 2528,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2352,
+        128
+      ],
+      "id": "c9f99a5e-5da5-47ad-96ab-8dd6696621e1",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "💾 STORAGE\n─────────────────────────────\n\"Normalize lead fields\" flattens the nested\nAI output into a clean flat structure.\n\nAll fields are written to the Supabase\n\"leads\" table with status = 'new'.\n\n",
+        "height": 640,
+        "width": 960,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        4336,
+        624
+      ],
+      "id": "22373f94-04c3-43f5-bdb8-e4b03ae376a1",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "👁️ HUMAN REVIEW LOOP\n─────────────────────────────\nFetches up to 2 leads with status = 'new'\nfrom Supabase, ordered by latest.\n\nEach lead is shown as a Telegram card with:\n  [Add (Approve)] [Discard (Blacklist)] [Done]\n\nButton actions:\n- Add     → status set to 'approved'\n- Discard → status set to 'blacklist'\n- Done    → exits the review loop\n- More    → swaps the queue to show\n             the second queued lead\n\n\"Only one lead in queue?\" handles the case\nwhere fewer than 2 leads are available.\n\"Empty Review\" fires if the queue is empty.",
+        "height": 656,
+        "width": 1664,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -688,
+        -544
+      ],
+      "id": "29dceb2e-06a7-4133-ab21-56d27d1a164c",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "amount": 30
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        2704,
+        720
+      ],
+      "id": "165919ed-d0ab-4c3d-8532-18cfc7330ce4",
+      "name": "30 sec wait",
+      "webhookId": "7fa1e8d3-4e58-4e32-a2a4-7572f9a5bcda"
+    },
+    {
+      "parameters": {
+        "content": "💾 Full Batched Handler\n─────────────────────────────\n\"Full batch scraped?\" checks if 5 leads have\nbeen processed (duplicate + corporate combined):\n- Yes → stop and notify user with lead count.\n- No  → loop back and scrape the next batch.",
+        "height": 432,
+        "width": 1360,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        976,
+        816
+      ],
+      "id": "ea3f0dc5-ab9d-4f27-83be-68fce3ceb539",
+      "name": "Sticky Note7"
     }
   ],
   "pinData": {},
@@ -1360,25 +2324,14 @@
       "main": [
         [
           {
-            "node": "Recombine Data",
+            "node": "Supabase DB Check",
             "type": "main",
             "index": 0
           },
           {
-            "node": "Supabase DB Check",
+            "node": "Recombine scrape + DB check",
             "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Recombine Data": {
-      "main": [
-        [
-          {
-            "node": "Keep Only New Leads",
-            "type": "main",
-            "index": 0
+            "index": 1
           }
         ]
       ]
@@ -1388,6 +2341,13 @@
         [
           {
             "node": "Merge Batch",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Count 'duplicate'",
             "type": "main",
             "index": 0
           }
@@ -1409,18 +2369,7 @@
       "main": [
         [
           {
-            "node": "Parse Result",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Parse Result": {
-      "main": [
-        [
-          {
-            "node": "Split Evaluated Results",
+            "node": "Parse AI batch evaluation",
             "type": "main",
             "index": 0
           }
@@ -1431,92 +2380,18 @@
       "main": [
         [
           {
-            "node": "Output Router1",
+            "node": "Valid or Corporate?",
             "type": "main",
             "index": 0
           }
         ]
-      ]
-    },
-    "Send a text message": {
-      "main": [
-        []
       ]
     },
     "Telegram Trigger": {
       "main": [
         [
           {
-            "node": "Get New Leads",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Switch": {
-      "main": [
-        [
-          {
-            "node": "Update a row",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Create a row2",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Edit Fields2",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields": {
-      "main": [
-        [
-          {
-            "node": "Scraper API",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Limit": {
-      "main": [
-        [
-          {
-            "node": "Aggregate1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Limit1": {
-      "main": [
-        [
-          {
-            "node": "Wait",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields1": {
-      "main": [
-        [
-          {
-            "node": "Switch",
+            "node": "Get Previous 'New' Leads",
             "type": "main",
             "index": 0
           }
@@ -1527,68 +2402,7 @@
       "main": [
         [
           {
-            "node": "Delete a chat message",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Send a text message2": {
-      "main": [
-        []
-      ]
-    },
-    "Output Router1": {
-      "main": [
-        [
-          {
-            "node": "Create a row",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Create a row1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create a row": {
-      "main": [
-        [
-          {
-            "node": "Aggregate",
-            "type": "main",
-            "index": 0
-          },
-          {
-            "node": "Limit1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Aggregate": {
-      "main": [
-        [
-          {
-            "node": "Send a text message3",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Wait": {
-      "main": [
-        [
-          {
-            "node": "Send a text message2",
+            "node": "Next lead exist?",
             "type": "main",
             "index": 0
           }
@@ -1599,87 +2413,7 @@
       "main": [
         [
           {
-            "node": "Recombine Data",
-            "type": "main",
-            "index": 1
-          }
-        ]
-      ]
-    },
-    "Aggregate1": {
-      "main": [
-        [
-          {
-            "node": "If1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Create a row2": {
-      "main": [
-        [
-          {
-            "node": "Delete a row",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Delete a row": {
-      "main": [
-        [
-          {
-            "node": "Delete a chat message",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Edit Fields2": {
-      "main": [
-        [
-          {
-            "node": "Scraper API",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If": {
-      "main": [
-        [
-          {
-            "node": "Send a text message",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Send a text message5",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If1": {
-      "main": [
-        [
-          {
-            "node": "Swap Queue",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Call_back or Message",
+            "node": "Recombine scrape + DB check",
             "type": "main",
             "index": 0
           }
@@ -1688,31 +2422,7 @@
     },
     "Delete a chat message": {
       "main": [
-        [
-          {
-            "node": "If",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "If2": {
-      "main": [
-        [
-          {
-            "node": "Send a text message4",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Send a text message6",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Swap Queue": {
@@ -1730,32 +2440,21 @@
       "main": [
         [
           {
-            "node": "Edit Fields",
+            "node": "Review exist?",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "If2",
+            "node": "Target(TG) & Offset",
             "type": "main",
             "index": 0
           }
         ],
         [
           {
-            "node": "Send a text message1",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Get New Leads": {
-      "main": [
-        [
-          {
-            "node": "Limit",
+            "node": "Welcome",
             "type": "main",
             "index": 0
           }
@@ -1766,7 +2465,7 @@
       "main": [
         [
           {
-            "node": "Edit Fields1",
+            "node": "Action/Chat_ID",
             "type": "main",
             "index": 0
           }
@@ -1774,6 +2473,716 @@
         [
           {
             "node": "Commands",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Collect lead summaries",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "30 sec wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Summarize": {
+      "main": [
+        [
+          {
+            "node": "Found Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update a row1": {
+      "main": [
+        [
+          {
+            "node": "Next lead exist?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has IG Profile?": {
+      "main": [
+        [
+          {
+            "node": "Apify - IG Profile Scraper1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "IG Null1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has FB Page?": {
+      "main": [
+        [
+          {
+            "node": "Apify - FB Page Scraper1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FB Null1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Evaluate Lead (Groq)1": {
+      "main": [
+        [
+          {
+            "node": "Collect new leads batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request to Web Scraper1": {
+      "main": [
+        [
+          {
+            "node": "Website audit succeeded?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Groq Vision Analysis1": {
+      "main": [
+        [
+          {
+            "node": "Parse website audit result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualitative Audit1": {
+      "main": [
+        [
+          {
+            "node": "Qualitative Format1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apify - IG Profile Scraper1": {
+      "main": [
+        [
+          {
+            "node": "IG Scraper Format1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Apify - FB Page Scraper1": {
+      "main": [
+        [
+          {
+            "node": "FB Scraper Format1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG Scraper Format1": {
+      "main": [
+        [
+          {
+            "node": "Merge FB + IG + Website data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "FB Scraper Format1": {
+      "main": [
+        [
+          {
+            "node": "Has IG Profile?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Audit Fail1": {
+      "main": [
+        [
+          {
+            "node": "Merge FB + IG + Website data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "IG Null1": {
+      "main": [
+        [
+          {
+            "node": "Merge FB + IG + Website data",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "FB Null1": {
+      "main": [
+        [
+          {
+            "node": "Has IG Profile?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualitative Format1": {
+      "main": [
+        [
+          {
+            "node": "Merge FB + IG + Website data",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Original Prompts": {
+      "main": [
+        [
+          {
+            "node": "Target exist?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review or More": {
+      "main": [
+        []
+      ]
+    },
+    "All Done": {
+      "main": [
+        [
+          {
+            "node": "Delete a chat message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Action/Chat_ID": {
+      "main": [
+        [
+          {
+            "node": "Which callback?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Target(DB) & Offset": {
+      "main": [
+        [
+          {
+            "node": "Original Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Target(TG) & Offset": {
+      "main": [
+        [
+          {
+            "node": "Original Prompts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Target exist?": {
+      "main": [
+        [
+          {
+            "node": "Scraper API",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Scanning",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Target Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Previous 'New' Leads": {
+      "main": [
+        [
+          {
+            "node": "Limit 2 latest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit 2 latest": {
+      "main": [
+        [
+          {
+            "node": "Build review queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2 current leads?": {
+      "main": [
+        [
+          {
+            "node": "Swap Queue",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Call_back or Message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Clean messy data": {
+      "main": [
+        [
+          {
+            "node": "save as 'new' in db",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "save as 'new' in db": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Scrape new batch": {
+      "main": [
+        [
+          {
+            "node": "Scraper API",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count 'duplicate'": {
+      "main": [
+        [
+          {
+            "node": "Merge duplicate + corporate counts",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Count 'corporate'": {
+      "main": [
+        [
+          {
+            "node": "Merge duplicate + corporate counts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Review exist?": {
+      "main": [
+        [
+          {
+            "node": "New Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Empty Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "New Lead": {
+      "main": [
+        [
+          {
+            "node": "Delete a chat message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Next lead exist?": {
+      "main": [
+        [
+          {
+            "node": "All Done",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "New Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "More than 5?": {
+      "main": [
+        [
+          {
+            "node": "Scrape new batch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Which callback?": {
+      "main": [
+        [
+          {
+            "node": "Update a row",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update a row1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Review exist?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Target(DB) & Offset",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has website URL?": {
+      "main": [
+        [
+          {
+            "node": "Pass null website audit",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "HTTP Request to Web Scraper1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Valid or Corporate?": {
+      "main": [
+        [
+          {
+            "node": "Summarize",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Count 'corporate'",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Create a row1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build review queue": {
+      "main": [
+        [
+          {
+            "node": "2 current leads?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect current lead": {
+      "main": [
+        [
+          {
+            "node": "Has website URL?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Has FB Page?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Collect new leads batch",
+            "type": "main",
+            "index": 1
+          },
+          {
+            "node": "Qualitative Audit1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect lead summaries": {
+      "main": [
+        [
+          {
+            "node": "Review or More",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect batch counts": {
+      "main": [
+        [
+          {
+            "node": "More than 5?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge duplicate + corporate counts": {
+      "main": [
+        [
+          {
+            "node": "Collect batch counts",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Collect new leads batch": {
+      "main": [
+        [
+          {
+            "node": "Clean messy data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge FB + IG + Website data": {
+      "main": [
+        [
+          {
+            "node": "Build master lead payload",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recombine scrape + DB check": {
+      "main": [
+        [
+          {
+            "node": "Keep Only New Leads",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse AI batch evaluation": {
+      "main": [
+        [
+          {
+            "node": "Split Evaluated Results",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse website audit result": {
+      "main": [
+        [
+          {
+            "node": "Audit Fail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Build master lead payload": {
+      "main": [
+        [
+          {
+            "node": "Evaluate Lead (Groq)1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Website audit succeeded?": {
+      "main": [
+        [
+          {
+            "node": "Audit Fail1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Groq Vision Analysis1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass null website audit": {
+      "main": [
+        [
+          {
+            "node": "Merge FB + IG + Website data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "30 sec wait": {
+      "main": [
+        [
+          {
+            "node": "Collect current lead",
             "type": "main",
             "index": 0
           }
@@ -1788,7 +3197,7 @@
     "timeSavedMode": "fixed",
     "callerPolicy": "workflowsFromSameOwner"
   },
-  "versionId": "9144cce5-1bc8-44f9-845a-8cddc13317c2",
+  "versionId": "a1ae7e54-53d7-4137-86e9-574f852bab80",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "c9549210d8467cae1a623788ba199b39aa8d4d550a080f41cbed854057b200e7"
