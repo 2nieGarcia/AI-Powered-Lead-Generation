@@ -130,7 +130,7 @@ This project demonstrates **end-to-end AI/ML engineering** by building an autono
 
 ### n8n Pipeline Visualization
 
-![n8n Pipeline Architecture](./docs/screenshots/pipeline.png)
+![n8n Pipeline Architecture](./docs/screenshots/00-pipeline.png)
 
 <details>
 <summary><b> Click to expand detailed pipeline stages with screenshots</b></summary>
