@@ -4,6 +4,40 @@ from schemas.scan import LeadResult
 
 logger = logging.getLogger(__name__)
 
+def _listing_panel(page, name: str):
+    # The opened listing is the role="main" region labelled with its name.
+    # The results feed beside it holds other businesses' links, so never search the whole page.
+    return page.get_by_role("main", name=name, exact=True)
+
+async def _extract_links(panel) -> tuple[str | None, str | None, str | None]:
+    website = None
+    facebook = None
+    instagram = None
+
+    website_el = panel.locator('a[data-item-id^="authority"]')
+    if await website_el.count() > 0:
+        raw_website = await website_el.first.get_attribute('href')
+        if raw_website:
+            raw_website = raw_website.strip()
+            if "facebook.com" in raw_website.lower():
+                facebook = raw_website
+            elif "instagram.com" in raw_website.lower():
+                instagram = raw_website
+            else:
+                website = raw_website
+
+    all_links = await panel.locator('a[href^="http"]').all()
+    for link in all_links:
+        href = await link.get_attribute('href') or ""
+        href_lower = href.lower()
+
+        if "facebook.com" in href_lower and not facebook:
+            facebook = href.strip()
+        elif "instagram.com" in href_lower and not instagram:
+            instagram = href.strip()
+
+    return website, facebook, instagram
+
 async def scrape_google_maps(target: str, max_result: int, offset: int = 0) -> list[LeadResult]:
     logger.info(f"Starting scan for : {target} with max results {max_result} | offset of {offset}")
     results = []
@@ -56,10 +90,16 @@ async def scrape_google_maps(target: str, max_result: int, offset: int = 0) -> l
                 await card.click()
                 await page.wait_for_timeout(2000)
 
+                panel = _listing_panel(page, name)
+                try:
+                    await panel.first.wait_for(timeout=10000)
+                except Exception:
+                    logger.warning(f"[{name}] Listing panel did not open")
+
                 phone = None
 
                 try:
-                    phone_el = page.locator('button[data-item-id^="phone"]')
+                    phone_el = panel.locator('button[data-item-id^="phone"]')
                     if await phone_el.count() > 0:
                         raw_phone = await phone_el.first.get_attribute('data-item-id')
                         if raw_phone:
@@ -69,7 +109,7 @@ async def scrape_google_maps(target: str, max_result: int, offset: int = 0) -> l
 
                 address = None
                 try:
-                    address_el = page.locator('button[data-item-id^="address"]')
+                    address_el = panel.locator('button[data-item-id^="address"]')
                     if await address_el.count() > 0:
                         raw_address = await address_el.first.inner_text()
                         if raw_address:
@@ -82,29 +122,7 @@ async def scrape_google_maps(target: str, max_result: int, offset: int = 0) -> l
                 instagram = None
 
                 try:
-                    website_el = page.locator('a[data-item-id^="authority"]')
-                    if await website_el.count() > 0:
-                        raw_website = await website_el.first.get_attribute('href')
-                        if raw_website:
-                            raw_website = raw_website.strip()
-                            if "facebook.com" in raw_website.lower():
-                                facebook = raw_website
-                            elif "instagram.com" in raw_website.lower():
-                                instagram = raw_website
-                            else:
-                                website = raw_website
-
-
-
-                    all_links = await page.locator('a[href^="http"]').all()
-                    for link in all_links:
-                        href = await link.get_attribute('href') or ""
-                        href_lower = href.lower()
-
-                        if "facebook.com" in href_lower and not facebook:
-                            facebook = href.strip()
-                        elif "instagram.com" in href_lower and not instagram:
-                            instagram = href.strip()
+                    website, facebook, instagram = await _extract_links(panel)
                 except Exception as e:
                     logger.warning(f"[{name}] Website extraction failed: {e}")
 
