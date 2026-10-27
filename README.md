@@ -33,7 +33,7 @@ This project demonstrates **end-to-end AI/ML engineering** by building an autono
 3. **Evaluates** lead quality using RAG-enhanced LLM inference with historical pattern matching
 4. **Routes** validated leads to storage while continuously learning from rejections
 
-> **Why This Matters:** Traditional lead generation is manual, expensive, and inconsistent. This system automates the entire funnel while achieving **92% cost reduction** compared to GPT-4 through intelligent batching and model selection.
+> **Why This Matters:** Traditional lead generation is manual, expensive, and inconsistent. This system automates the entire funnel, from search to a scored, review-ready lead.
 
 ---
 
@@ -64,14 +64,15 @@ This project demonstrates **end-to-end AI/ML engineering** by building an autono
 </tr>
 </table>
 
-### Technical Achievements
+### Measured Results
 
-| Metric                       | Result              | How                                   |
-| ---------------------------- | ------------------- | ------------------------------------- |
-| **92% Cost Reduction**       | vs. GPT-4 baseline  | Groq API + intelligent batching       |
-| **~18s End-to-End**          | for 50 leads        | Parallel scraping + single LLM call   |
-| **10k+ Leads/Day**           | throughput capacity | pgvector indexes + connection pooling |
-| **Zero Manual Intervention** | after deployment    | Self-learning blacklist system        |
+| Metric                    | Result                                                    | Source                                                  |
+| ------------------------- | --------------------------------------------------------- | ------------------------------------------------------- |
+| **Google Maps scrape**    | 4.18 s per lead (mean of 20 leads, batches of 5)          | [October 2026 run](./benchmarks/2026-10-lead-run.md)    |
+| **Facebook URL accuracy** | 20 of 20 match their own listing (3 have a URL, all distinct) | [October 2026 run](./benchmarks/2026-10-lead-run.md)    |
+| **Website capture**       | 5.05 s per site (mean), 7 of 8 sites captured             | [October 2026 run](./benchmarks/2026-10-lead-run.md)    |
+
+The LLM stages, cost per lead and end-to-end time were not measured in that run. The benchmark lists why.
 
 ---
 
@@ -207,7 +208,7 @@ This project demonstrates **end-to-end AI/ML engineering** by building an autono
 
 ## RAG Implementation Deep Dive
 
-The system implements **Retrieval-Augmented Generation (RAG)** to provide historical context to the LLM, dramatically improving classification accuracy.
+The system implements **Retrieval-Augmented Generation (RAG)** to give the LLM historical context from past accepted and rejected leads.
 
 ### Vector Embedding Pipeline
 
@@ -435,20 +436,16 @@ docker compose up -d --build
 
 ## Performance Benchmarks
 
-| Operation                    | Latency  | Throughput       | Notes                        |
-| ---------------------------- | -------- | ---------------- | ---------------------------- |
-| Web Scrape (50 leads)        | ~12s     | ~4.2 leads/s     | Parallel Playwright contexts |
-| Deduplication Check          | <1s      | 10k+ checks/s    | PostgreSQL RPC               |
-| RAG Vector Search            | ~0.8s    | —                | pgvector with IVFFlat index  |
-| Batch LLM Evaluation         | ~3.2s    | 15.6 leads/s     | Single Groq API call         |
-| **Full Pipeline (50 leads)** | **~18s** | **~2.8 leads/s** | End-to-end                   |
+Measured on 2026-10-27 with `dental clinic Quezon City`, 20 leads. Full method, environment and per-lead records: [benchmarks/2026-10-lead-run.md](./benchmarks/2026-10-lead-run.md).
 
-### Cost Analysis
+| Operation                         | Result                                          |
+| --------------------------------- | ----------------------------------------------- |
+| Google Maps scrape                | 83.6 s for 20 leads, 4.18 s per lead (mean)     |
+| Facebook URL matches the listing  | 20 of 20 leads (17 correctly have none)         |
+| Facebook URLs distinct            | 3 of 3 leads that have one                      |
+| Website capture (DOM + 3 shots)   | 5.05 s per site (mean), 7 of 8 sites captured   |
 
-| Approach                       | Cost per 1000 Leads | Savings           |
-| ------------------------------ | ------------------- | ----------------- |
-| GPT-4 (per-lead)               | ~$2.50              | Baseline          |
-| **This System (Groq batched)** | **~$0.20**          | **92% reduction** |
+Not measured in that run: the chain filter, Facebook/Instagram footprint, qualitative audit, website vision scoring, RAG lookup and lead scoring, and therefore LLM tokens, cost per lead and end-to-end time. The benchmark lists which service blocked each one. Reproduce with `python benchmarks/run_benchmark.py "dental clinic Quezon City" --leads 20`.
 
 ---
 
@@ -457,14 +454,14 @@ docker compose up -d --build
 <details>
 <summary><b>Why Groq + Batching over GPT-4?</b></summary>
 
-Groq's Llama 3.1 provides near-instant inference (~150 tokens/s) at a fraction of OpenAI's cost. By batching leads into a single prompt, we amortize the per-request overhead and achieve consistent JSON output through schema enforcement.
+Groq serves open Llama models through an OpenAI-compatible API. By batching leads into a single prompt, we amortize the per-request overhead and achieve consistent JSON output through schema enforcement.
 
 </details>
 
 <details>
 <summary><b>Why pgvector over Pinecone/Weaviate?</b></summary>
 
-Supabase offers pgvector natively, eliminating the need for a separate vector database service. This reduces infrastructure complexity while maintaining sub-second similarity search with IVFFlat indexes.
+Supabase offers pgvector natively, eliminating the need for a separate vector database service. This reduces infrastructure complexity.
 
 </details>
 
