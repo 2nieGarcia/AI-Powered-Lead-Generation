@@ -14,3 +14,7 @@ n8n_data/
 
 # Docker
 *.log
+
+# Local logs and editor state
+logs.txt
+.vscode/
